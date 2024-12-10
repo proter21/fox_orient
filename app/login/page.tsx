@@ -1,82 +1,114 @@
-import Link from 'next/link';
+"use client";
 
-export default function LoginPage() {
+import React, { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import MyNavbar from "@/components/MyNavbar";
+import MyFooter from "@/components/MyFooter";
+import Link from "next/link";
+import { auth } from "../firebase/firebase";
+import { FirebaseError } from "firebase/app";
+const LoginPage = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push("/profile"); // Пренасочване към профила след успешен вход
+    } catch (error) {
+      if (error instanceof FirebaseError) {
+        setError(error.message); // Firebase error message
+      } else {
+        setError("Неизвестна грешка при влизането.");
+      }
+    }
+  };
+
   return (
     <main>
-      {/* Header */}
-      <header className="fixed top-0 left-0 w-full bg-gray-800 text-white py-4 z-50 shadow-md">
-        <div className="container mx-auto flex justify-between items-center px-4">
-          <div className="text-orange-500 text-2xl font-bold">
-            <Link href="/">
-              <a>FoxOrient</a>
-            </Link>
-          </div>
-          <nav className="flex space-x-4">
-            <Link href="#features">
-              <a className="text-white hover:text-orange-400">Функции</a>
-            </Link>
-            <Link href="#events">
-              <a className="text-white hover:text-orange-400">Събития</a>
-            </Link>
-            <Link href="/gallery">
-              <a className="text-white hover:text-orange-400">Галерия</a>
-            </Link>
-            <Link href="#about">
-              <a className="text-white hover:text-orange-400">За нас</a>
-            </Link>
-            <Link href="/register">
-              <a className="text-white hover:text-orange-400">Регистрация</a>
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <MyNavbar />
+      <section className="login py-12 my-12">
+        <div className="container mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+            Вход
+          </h2>
+          <div className="form bg-white rounded-lg shadow-lg p-8 w-full max-w-md mx-auto">
+            <form onSubmit={handleSubmit} id="loginForm">
+              {/* Email */}
+              <div className="form-group mb-4">
+                <label
+                  htmlFor="email"
+                  className="block text-lg font-bold mb-2 text-gray-700"
+                >
+                  Имейл
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="Вашият имейл"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
 
-      {/* Login Section */}
-      <section className="login py-12">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Вход</h2>
-          <form id="loginForm">
-            <div className="form-group mb-4">
-              <label htmlFor="username" className="block text-lg">Потребителско име</label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                required
-                placeholder="Вашето потребителско име"
-                className="w-full p-3 border rounded"
-              />
+              {/* Password */}
+              <div className="form-group mb-6">
+                <label
+                  htmlFor="password"
+                  className="block text-lg font-bold mb-2 text-gray-700"
+                >
+                  Парола
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="Парола"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+
+              {/* Error message */}
+              {error && (
+                <div className="text-red-500 text-center mb-4">{error}</div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className="btn-primary bg-orange-500 text-white w-full py-3 rounded-lg text-lg font-bold hover:bg-orange-600 transition-all"
+              >
+                Вход
+              </button>
+            </form>
+
+            {/* Link to Register page */}
+            <div className="text-center mt-4">
+              <span className="text-gray-600">Нямате акаунт? </span>
+              <Link
+                href="/register"
+                className="text-orange-500 hover:text-orange-600 underline font-bold"
+              >
+                Регистрирайте се
+              </Link>
             </div>
-            <div className="form-group mb-6">
-              <label htmlFor="password" className="block text-lg">Парола</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                required
-                placeholder="Парола"
-                className="w-full p-3 border rounded"
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded text-lg"
-            >
-              Влезте
-            </button>
-          </form>
+          </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-6 text-center">
-        <p className="mb-4">&copy; 2024 FoxOrient. Всички права запазени.</p>
-        <div className="space-x-4">
-          <a href="#" className="text-orange-500 hover:text-orange-400">Facebook</a>
-          <a href="#" className="text-orange-500 hover:text-orange-400">Instagram</a>
-          <a href="#" className="text-orange-500 hover:text-orange-400">Twitter</a>
-        </div>
-      </footer>
+      <MyFooter />
     </main>
   );
-}
+};
+
+export default LoginPage;

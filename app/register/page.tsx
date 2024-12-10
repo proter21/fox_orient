@@ -15,38 +15,36 @@ export default function RegisterPage() {
             <form id="registrationForm">
               <div className="form-group mb-4">
                 <label
-                  htmlFor="firstName"
+                  htmlFor="fullName"
                   className="block text-lg font-bold mb-2 text-gray-700"
                 >
-                  Име
+                  Име и фамилия
                 </label>
                 <input
                   type="text"
-                  id="firstName"
-                  name="firstName"
+                  id="fullName"
+                  name="fullName"
                   required
-                  placeholder="Вашето име"
+                  placeholder="Вашето име и фамилия"
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
               </div>
-              {/* Last Name */}
               <div className="form-group mb-4">
                 <label
-                  htmlFor="lastName"
+                  htmlFor="email"
                   className="block text-lg font-bold mb-2 text-gray-700"
                 >
-                  Фамилия
+                  Имейл
                 </label>
                 <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
+                  type="email"
+                  id="email"
+                  name="email"
                   required
-                  placeholder="Вашата фамилия"
+                  placeholder="Вашият имейл"
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
               </div>
-              {/* Birth Date */}
               <div className="form-group mb-4">
                 <label
                   htmlFor="birthDate"
@@ -62,7 +60,6 @@ export default function RegisterPage() {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
               </div>
-              {/* Password */}
               <div className="form-group mb-6">
                 <label
                   htmlFor="password"
@@ -95,7 +92,7 @@ export default function RegisterPage() {
                   Съгласявам се с&nbsp;
                   <Link
                     href="/terms"
-                    className="text-orange-500 underline font-bold"
+                    className="text-orange-500 hover:text-orange-600 underline font-bold"
                   >
                     условията на сайта
                   </Link>

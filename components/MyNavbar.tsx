@@ -5,9 +5,14 @@ import Link from "next/link";
 
 const MyNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   // Затваряне на менюто при клик извън него
@@ -28,7 +33,7 @@ const MyNavbar = () => {
           </Link>
         </div>
 
-        {/* Навигационни линкове за десктоп */}
+        {/* Навигационни линкове за големи екрани */}
         <nav className="hidden md:flex space-x-6 ml-auto">
           <Link href="/#features" className="text-white hover:text-orange-400">
             Функции
@@ -42,45 +47,64 @@ const MyNavbar = () => {
           <Link href="/#about" className="text-white hover:text-orange-400">
             За нас
           </Link>
-          <Link href="/register">
-            <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded">
-              Регистрирай се
+
+          {/* Падащо меню за вход и регистрация */}
+          <div className="relative">
+            <button
+              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
+              onClick={toggleDropdown}
+            >
+              Вход/Регистрация
             </button>
-          </Link>
+            {isDropdownOpen && (
+              <div className="absolute mt-2 bg-zinc-800 text-white rounded shadow-lg w-44 opacity-85">
+                <Link href="/login">
+                  <button className="w-full text-left px-4 py-2 hover:bg-orange-600">
+                    Вход
+                  </button>
+                </Link>
+                <Link href="/register">
+                  <button className="w-full text-left px-4 py-2 hover:bg-orange-600">
+                    Регистрирай се
+                  </button>
+                </Link>
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* Бургер бутон за мобилни екрани */}
-
-        <button
-          className={`p-4 md:hidden text-4xl focus:outline-none transition-all duration-300 ease-in-out absolute top-1/2 right-4 transform -translate-y-1/2 z-50`}
-          onClick={toggleMenu}
-          aria-label="Toggle navigation"
-        >
-          {/* Три черти за бургер меню */}
-          <div
-            className={`w-6 h-0.5 bg-orange-500 block transition-all duration-300 ease-in-out ${
-              isMenuOpen ? "rotate-45 translate-y-1" : ""
-            }`}
-          ></div>
-          <div
-            className={`w-6 h-0.5 bg-orange-500 block transition-all duration-300 ease-in-out ${
-              isMenuOpen ? "opacity-0" : ""
-            }`}
-          ></div>
-          <div
-            className={`w-6 h-0.5 bg-orange-500 block transition-all duration-300 ease-in-out ${
-              isMenuOpen ? "-rotate-45 translate-y-[-1px]" : ""
-            }`}
-          ></div>
-        </button>
+        <div className="relative md:hidden">
+          <button
+            className="p-4 text-4xl focus:outline-none transition-all duration-300 ease-in-out"
+            onClick={toggleMenu}
+            aria-label="Toggle navigation"
+          >
+            <div
+              className={`w-6 h-0.5 bg-orange-500 block transition-all duration-300 ease-in-out ${
+                isMenuOpen ? "rotate-45 translate-y-1" : ""
+              }`}
+            ></div>
+            <div
+              className={`w-6 h-0.5 bg-orange-500 block transition-all duration-300 ease-in-out ${
+                isMenuOpen ? "opacity-0" : ""
+              }`}
+            ></div>
+            <div
+              className={`w-6 h-0.5 bg-orange-500 block transition-all duration-300 ease-in-out ${
+                isMenuOpen ? "-rotate-45 translate-y-[-1px]" : ""
+              }`}
+            ></div>
+          </button>
+        </div>
       </div>
 
       {/* Мобилно меню */}
       <nav
         className={`${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
-        } fixed top-0 right-0 w-7/8 bg-zinc-800 text-white h-full md:hidden transition-all duration-300 ease-in-out`}
-        onClick={closeMenu} // Затваряне при клик извън менюто
+        } fixed top-0 right-0 w-7/8 bg-zinc-800 mt-16 text-white h-full md:hidden transition-all duration-300 ease-in-out`}
+        onClick={closeMenu}
       >
         <ul className="space-y-4 p-4 text-sm my-8">
           <li>
@@ -122,10 +146,20 @@ const MyNavbar = () => {
           <li>
             <Link href="/register">
               <button
-                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
+                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded w-full"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Регистрирай се
+              </button>
+            </Link>
+          </li>
+          <li>
+            <Link href="/login">
+              <button
+                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded w-full"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Вход
               </button>
             </Link>
           </li>

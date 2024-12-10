@@ -1,49 +1,77 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import Autoplay from "embla-carousel-autoplay";
 import MyNavbar from "@/components/MyNavbar";
 import MyFooter from "@/components/MyFooter";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 export default function Home() {
   return (
     <main>
       <MyNavbar />
 
-      <section className="relative bg-zinc-800 text-white h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 flex">
-          <Image
-            src="/images/WorldChamp2022.jpg"
-            alt="Снимка 1"
-            className="w-1/3 object-cover"
-            width={600}
-            height={400}
-          />
-          <Image
-            src="/images/WorldChampCeremony2022.jpg"
-            alt="Снимка 2"
-            className="w-1/3 object-cover"
-            width={600}
-            height={400}
-          />
-          <Image
-            src="/images/WorldChampChec2024.jpg"
-            alt="Снимка 3"
-            className="w-1/3 object-cover"
-            width={600}
-            height={400}
-          />
-        </div>
-        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-        <div className="relative z-10 text-center px-4">
-          <h2 className="text-4xl font-bold mb-4">Добре дошли в FoxOrient</h2>
-          <p className="text-lg mb-6">
-            Интернет приложение за улеснена организация на състезания по спортно
-            радиоориентиране.
-          </p>
-          <Link href="/register">
-            <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded text-lg">
-              Започнете сега
-            </button>
-          </Link>
+      <section className="relative bg-zinc-800 text-white h-screen mt-16 flex items-center justify-center overflow-hidden">
+        <Carousel
+          plugins={[
+            Autoplay({
+              delay: 2000,
+            }),
+          ]}
+        >
+          <CarouselContent>
+            <CarouselItem>
+              <Image
+                src="/images/WorldChamp2022.jpg"
+                alt="Снимка 1"
+                className="w-full  object-cover"
+                width={600}
+                height={400}
+              />
+            </CarouselItem>
+            <CarouselItem>
+              <Image
+                src="/images/WorldChampCeremony2022.jpg"
+                alt="Снимка 2"
+                className="w-full object-cover"
+                width={600}
+                height={400}
+              />
+            </CarouselItem>
+            <CarouselItem>
+              <Image
+                src="/images/WorldChampChec2024.jpg"
+                alt="Снимка 3"
+                className="w-full object-fill"
+                width={600}
+                height={400}
+              />
+            </CarouselItem>
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+
+        {/* Overlay with text */}
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="text-center text-white px-4">
+            <h2 className="text-4xl font-bold mb-4">Добре дошли в FoxOrient</h2>
+            <p className="text-lg mb-6">
+              Интернет приложение за улеснена организация на състезания по
+              спортно радиоориентиране.
+            </p>
+            <Link href="/register">
+              <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded text-lg">
+                Започнете сега
+              </button>
+            </Link>
+          </div>
         </div>
       </section>
 
