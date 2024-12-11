@@ -19,7 +19,7 @@ const LoginPage = () => {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push("/profile"); // Пренасочване към профила след успешен вход
+      router.push("/"); // Пренасочване към профила след успешен вход
     } catch (error) {
       if (error instanceof FirebaseError) {
         setError(error.message); // Firebase error message

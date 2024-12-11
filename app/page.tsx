@@ -21,7 +21,7 @@ export default function Home() {
         <Carousel
           plugins={[
             Autoplay({
-              delay: 2000,
+              delay: 3000,
             }),
           ]}
         >
@@ -46,7 +46,7 @@ export default function Home() {
             </CarouselItem>
             <CarouselItem>
               <Image
-                src="/images/WorldChampChec2024.jpg"
+                src="/images/evr2022.jpg"
                 alt="Снимка 3"
                 className="w-full object-fill"
                 width={600}

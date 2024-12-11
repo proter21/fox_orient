@@ -1,8 +1,56 @@
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import MyNavbar from "@/components/MyNavbar";
 import MyFooter from "@/components/MyFooter";
 import Link from "next/link";
+import { auth, db } from "../firebase/firebase";
 
 export default function RegisterPage() {
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const form = e.currentTarget;
+    const fullName = (form.elements.namedItem("fullName") as HTMLInputElement)
+      .value;
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    const birthDate = (form.elements.namedItem("birthDate") as HTMLInputElement)
+      .value;
+    const password = (form.elements.namedItem("password") as HTMLInputElement)
+      .value;
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      await setDoc(doc(db, "users", user.uid), {
+        fullName,
+        email,
+        birthDate,
+        createdAt: new Date().toISOString(),
+      });
+
+      router.push("/login");
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main>
       <MyNavbar />
@@ -12,7 +60,12 @@ export default function RegisterPage() {
             Регистрация
           </h2>
           <div className="form bg-white rounded-lg shadow-lg p-8 w-full max-w-md mx-auto">
-            <form id="registrationForm">
+            {error && (
+              <div className="text-red-500 text-center mb-4 font-semibold">
+                {error}
+              </div>
+            )}
+            <form id="registrationForm" onSubmit={handleRegister}>
               <div className="form-group mb-4">
                 <label
                   htmlFor="fullName"
@@ -76,7 +129,6 @@ export default function RegisterPage() {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
               </div>
-              {/* Terms */}
               <div className="form-group mb-6">
                 <label
                   htmlFor="terms"
@@ -98,12 +150,12 @@ export default function RegisterPage() {
                   </Link>
                 </label>
               </div>
-              {/* Submit Button */}
               <button
                 type="submit"
                 className="btn-primary bg-orange-500 text-white w-full py-3 rounded-lg text-lg font-bold hover:bg-orange-600 transition-all"
+                disabled={loading}
               >
-                Регистрирай се
+                {loading ? "Регистриране..." : "Регистрирай се"}
               </button>
             </form>
           </div>
