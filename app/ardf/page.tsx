@@ -78,16 +78,28 @@ const ArdfPage: React.FC = () => {
           <h1 className="text-zinc-900 p-4 rounded-lg text-2xl font-bold mb-2">
             Възрастови групи:
           </h1>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>М19 - Мъже на възраст 19 г. и по-млади, 4 предавателя</li>
+            <li>М21 - Мъже на всяка възраст, 5 предавателя</li>
+            <li>М40 - Мъже на възраст 40 г. и по-възрастни, 4 предавателя</li>
+            <li>М50 - Mъже възраст от 50 г. и по-възрастни, 4 предавателя</li>
+            <li>М60 - Мъже възраст 60 г. и по-възрастни, 3 предавателя </li>
+            <li>М70 - Мъже възраст 70 г. и по-възрастни, 3 предавателя</li>
+            <li>Ж19 - жени на възраст 19 г. и по-млади, 4 предавателя</li>
+            <li>Ж21 - жени от всяка възраст, 4 предавателя</li>
+            <li>Ж35 - жени на възраст 35 г. години, 4 предавателя</li>
+            <li>Ж50 - жени на възраст 50 г. и по-възрастни, 3 предавателя</li>
+            <li>Ж60 - жени на възраст 60 г. и по-възрастни, 3 предавателя</li>
+          </ul>
         </section>
 
-        {/* Видео от YouTube */}
         <section className="mb-12">
           <h2 className="text-2xl font-semibold mb-4">Гледайте видеото</h2>
           <div className="aspect-w-16 aspect-h-9 mb-8">
             <iframe
               width="560"
               height="315"
-              src="https://www.youtube.com/watch?v=uyW7p4s0o7E&t=27s"
+              src="https://www.youtube.com/embed/-47IqZ7p8I0?start=171"
               title="ARDF Introduction"
               frameBorder="0"
               allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -96,7 +108,6 @@ const ArdfPage: React.FC = () => {
           </div>
         </section>
 
-        {/* Галерия със снимки */}
         <section>
           <h2 className="text-2xl font-semibold mb-4">
             Снимки от ARDF събития

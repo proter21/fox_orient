@@ -6,12 +6,19 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { User } from "@/interfaces"; // Import User type
 import { auth, db } from "@/app/firebase/firebase";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarTrigger,
+} from "@/components/ui/menubar";
 
 const MyNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<User | null>(null);
+  const [activeSubMenu, setActiveSubMenu] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -46,17 +53,22 @@ const MyNavbar = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      setIsDropdownOpen(false);
+      setUser(null);
+      setUserData(null);
     } catch (err) {
       console.error("Error logging out:", err);
     }
+  };
+
+  const toggleSubMenu = (menu: string) => {
+    setActiveSubMenu(activeSubMenu === menu ? null : menu);
+  };
+
+  const goBack = () => {
+    setActiveSubMenu(null);
   };
 
   return (
@@ -68,70 +80,140 @@ const MyNavbar = () => {
           </Link>
         </div>
 
-        <nav className="hidden md:flex space-x-6 ml-auto">
-          <Link href="/#features" className="text-white hover:text-orange-400">
-            Функции
-          </Link>
-          <Link href="/#events" className="text-white hover:text-orange-400">
-            Събития
-          </Link>
-          <Link href="/gallery" className="text-white hover:text-orange-400">
-            Галерия
-          </Link>
-          <Link href="/about" className="text-white hover:text-orange-400">
-            За нас
-          </Link>
-
-          {user ? (
-            <div className="relative">
-              <button
-                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
-                onClick={toggleDropdown}
-              >
-                {userData?.fullName || user.email}
-              </button>
-              {isDropdownOpen && (
-                <div className="absolute mt-2 bg-zinc-800 text-white rounded shadow-lg w-44">
-                  <Link href="/profile">
-                    <button className="w-full text-left px-4 py-2 hover:bg-orange-600">
+        <Menubar className="hidden md:flex space-x-6 ml-auto bg-zinc-800 border-none">
+          <MenubarMenu>
+            <MenubarTrigger className="text-white hover:text-orange-400 transition duration-300 transform hover:scale-105 focus:bg-orange-600 rounded">
+              Функции
+            </MenubarTrigger>
+            <MenubarContent className="bg-zinc-800 text-white shadow-lg w-48 mt-2 rounded">
+              <MenubarItem asChild>
+                <Link
+                  href="/classes"
+                  className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                >
+                  Класове
+                </Link>
+              </MenubarItem>
+              <MenubarItem asChild>
+                <Link
+                  href="/results"
+                  className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                >
+                  Резултати
+                </Link>
+              </MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
+          <MenubarMenu>
+            <MenubarTrigger className="text-white hover:text-orange-400 transition duration-300 transform hover:scale-105 focus:bg-orange-600 rounded">
+              Събития
+            </MenubarTrigger>
+            <MenubarContent className="bg-zinc-800 text-white shadow-lg w-48 mt-2 rounded">
+              <MenubarItem asChild>
+                <Link
+                  href="/calendar"
+                  className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                >
+                  Календар
+                </Link>
+              </MenubarItem>
+              <MenubarItem asChild>
+                <Link
+                  href="/news"
+                  className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                >
+                  Новини
+                </Link>
+              </MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
+          <MenubarMenu>
+            <MenubarTrigger className="text-white hover:text-orange-400 transition duration-300 transform hover:scale-105 focus:bg-orange-600 rounded">
+              Галерия
+            </MenubarTrigger>
+            <MenubarContent className="bg-zinc-800 text-white shadow-lg w-48 mt-2 rounded">
+              <MenubarItem asChild>
+                <Link
+                  href="/gallery"
+                  className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                >
+                  Галерия
+                </Link>
+              </MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
+          <MenubarMenu>
+            <MenubarTrigger className="text-white hover:text-orange-400 transition duration-300 transform hover:scale-105 focus:bg-orange-600 rounded">
+              За нас
+            </MenubarTrigger>
+            <MenubarContent className="bg-zinc-800 text-white shadow-lg w-48 mt-2 rounded">
+              <MenubarItem asChild>
+                <Link
+                  href="/about"
+                  className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                >
+                  Кои сме ние
+                </Link>
+              </MenubarItem>
+              <MenubarItem asChild>
+                <Link
+                  href="/competitors"
+                  className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                >
+                  Състезатели
+                </Link>
+              </MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
+          <MenubarMenu>
+            <MenubarTrigger className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded focus:bg-orange-600">
+              {user ? userData?.fullName || user.email : "Вход/Регистрация"}
+            </MenubarTrigger>
+            <MenubarContent className="bg-zinc-800 text-white shadow-lg w-48 mt-2 rounded">
+              {user ? (
+                <>
+                  <MenubarItem asChild>
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                    >
                       Профил
+                    </Link>
+                  </MenubarItem>
+                  <MenubarItem asChild>
+                    <button
+                      onClick={handleLogout}
+                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                    >
+                      Изход
                     </button>
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-orange-600"
-                  >
-                    Изход
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="relative">
-              <button
-                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
-                onClick={toggleDropdown}
-              >
-                Вход/Регистрация
-              </button>
-              {isDropdownOpen && (
-                <div className="absolute mt-2 bg-zinc-800 text-white rounded shadow-lg w-44">
-                  <Link href="/login">
-                    <button className="w-full text-left px-4 py-2 hover:bg-orange-600 ">
+                  </MenubarItem>
+                </>
+              ) : (
+                <>
+                  <MenubarItem asChild>
+                    <Link
+                      href="/login"
+                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                    >
                       Вход
-                    </button>
-                  </Link>
-                  <Link href="/register">
-                    <button className="w-full text-left px-4 py-2 hover:bg-orange-600">
+                    </Link>
+                  </MenubarItem>
+                  <MenubarItem asChild>
+                    <Link
+                      href="/register"
+                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                    >
                       Регистрирай се
-                    </button>
-                  </Link>
-                </div>
+                    </Link>
+                  </MenubarItem>
+                </>
               )}
-            </div>
-          )}
-        </nav>
+            </MenubarContent>
+          </MenubarMenu>
+        </Menubar>
 
+        {/* Мобилно меню (burger) */}
         <div className="relative md:hidden">
           <button
             className="p-4 text-4xl focus:outline-none transition-all duration-300 ease-in-out"
@@ -157,94 +239,181 @@ const MyNavbar = () => {
         </div>
       </div>
 
+      {/* Responsive меню */}
       <nav
         className={`${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         } fixed top-0 right-0 w-7/8 bg-zinc-800 mt-16 text-white h-full md:hidden transition-all duration-300 ease-in-out`}
       >
-        <ul className="space-y-4 p-4 text-sm my-8">
-          <li>
-            <Link
-              href="/#features"
-              className="block py-2 text-white hover:text-orange-400"
-              onClick={() => setIsMenuOpen(false)}
+        {activeSubMenu ? (
+          <div className="space-y-4 p-4 text-sm my-8">
+            <button
+              className="block w-full text-left px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 text-white rounded"
+              onClick={goBack}
             >
-              Функции
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/#events"
-              className="block py-2 text-white hover:text-orange-400"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Събития
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/gallery"
-              className="block py-2 text-white hover:text-orange-400"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Галерия
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/about"
-              className="block py-2 text-white hover:text-orange-400"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              За нас
-            </Link>
-          </li>
-          {user ? (
-            <>
-              <li>
-                <Link
-                  href="/profile"
-                  className="block py-2 text-white hover:text-orange-400"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Профил
-                </Link>
-              </li>
-              <li>
-                <button
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded w-full"
-                  onClick={() => {
-                    handleLogout();
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  Изход
-                </button>
-              </li>
-            </>
-          ) : (
-            <>
-              <li>
-                <Link
-                  href="/login"
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Вход
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/register"
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Регистрирай се
-                </Link>
-              </li>
-            </>
-          )}
-        </ul>
+              Назад
+            </button>
+            <ul className="space-y-4">
+              {activeSubMenu === "functions" && (
+                <>
+                  <li>
+                    <Link
+                      href="/classes"
+                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Класове
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/results"
+                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Резултати
+                    </Link>
+                  </li>
+                </>
+              )}
+              {activeSubMenu === "events" && (
+                <>
+                  <li>
+                    <Link
+                      href="/calendar"
+                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Календар
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/news"
+                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Новини
+                    </Link>
+                  </li>
+                </>
+              )}
+              {activeSubMenu === "gallery" && (
+                <li>
+                  <Link
+                    href="/gallery"
+                    className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Галерия
+                  </Link>
+                </li>
+              )}
+              {activeSubMenu === "about" && (
+                <>
+                  <li>
+                    <Link
+                      href="/about"
+                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Кои сме ние
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/competitors"
+                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Състезатели
+                    </Link>
+                  </li>
+                </>
+              )}
+            </ul>
+          </div>
+        ) : (
+          <ul className="space-y-4 p-4 text-sm my-8">
+            <li>
+              <button
+                className="block w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:bg-orange-600"
+                onClick={() => toggleSubMenu("functions")}
+              >
+                Функции <span className="float-right">{">"}</span>
+              </button>
+            </li>
+            <li>
+              <button
+                className="block w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:bg-orange-600"
+                onClick={() => toggleSubMenu("events")}
+              >
+                Събития <span className="float-right">{">"}</span>
+              </button>
+            </li>
+            <li>
+              <button
+                className="block w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:bg-orange-600"
+                onClick={() => toggleSubMenu("gallery")}
+              >
+                Галерия <span className="float-right">{">"}</span>
+              </button>
+            </li>
+            <li>
+              <button
+                className="block w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:bg-orange-600"
+                onClick={() => toggleSubMenu("about")}
+              >
+                За нас <span className="float-right">{">"}</span>
+              </button>
+            </li>
+            {user ? (
+              <>
+                <li>
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 text-white rounded"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Профил
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    className="block w-full text-left px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 text-white rounded"
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Изход
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  <Link
+                    href="/login"
+                    className="block px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 text-white rounded"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Вход
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/register"
+                    className="block px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 text-white rounded"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Регистрирай се
+                  </Link>
+                </li>
+              </>
+            )}
+          </ul>
+        )}
       </nav>
     </header>
   );

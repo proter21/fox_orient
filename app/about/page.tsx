@@ -11,7 +11,7 @@ const AboutUsPage = () => {
       <div className="min-h-screen bg-neutral-200 text-black py-10">
         <div className="container mx-auto px-4">
           <div className="bg-white p-7 rounded-lg shadow-lg">
-            <h1 className="text-4xl font-bold text-orange-500 mb-6 text-center">
+            <h1 className="text-4xl font-bold text-orange-500 pt-3 mb-6 text-center">
               За нас
             </h1>
             <h1 className="text-zinc-900 p-4 rounded-lg text-2xl font-bold mb-2">
@@ -19,8 +19,8 @@ const AboutUsPage = () => {
             </h1>
             <div className="space-y-6 text-lg">
               <p>
-                Добре дошли в нашия уебсайт! Нашата федерация е Българската
-                Федерация по Радиоориентиране (БФРА), която обединява любители и
+                Добре дошли в нашия уебсайт! Ние сме Българската Федерация по
+                Радиоориентиране (БФРА), която обединява любители и
                 професионалисти в областта на спортното радиоориентиране и
                 радиозасичането. Създадена с цел популяризиране и развитие на
                 тези спортове в България, БФРА активно организира състезания,
@@ -101,13 +101,7 @@ const AboutUsPage = () => {
                 се свържете с нас!
               </p>
 
-              <div className="text-left mt-8">
-                <a
-                  href="/contact"
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg transition"
-                >
-                  Свържете се с нас
-                </a>
+              <div className="text-center mt-8">
                 <a
                   href="/ardf"
                   className="bg-orange-500 ml-5 hover:bg-orange-600 text-white px-6 py-3 rounded-lg transition"

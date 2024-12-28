@@ -50,7 +50,7 @@ const GalleryPage: React.FC = () => {
       <MyNavbar />
 
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold text-center mb-8 text-orange-500">
+        <h1 className="text-3xl font-bold text-center pt-10 mb-8 text-orange-500">
           Галерия
         </h1>
 
