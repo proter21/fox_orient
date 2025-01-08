@@ -30,18 +30,21 @@ export default function Home() {
               <Image
                 src="/images/WorldChamp2022.jpg"
                 alt="Снимка 1"
-                className="w-full  object-cover"
-                width={600}
-                height={400}
+                className="w-full object-cover"
+                width={400}
+                height={200}
+                quality={75}
+                priority={true}
               />
             </CarouselItem>
             <CarouselItem>
               <Image
-                src="/images/WorldChampCeremony2022.jpg"
+                src="https://i.ibb.co/NWhLhrb/World-Champ-Ceremony2022.jpg"
                 alt="Снимка 2"
                 className="w-full object-cover"
                 width={600}
                 height={400}
+                loading="lazy"
               />
             </CarouselItem>
             <CarouselItem>
@@ -51,6 +54,7 @@ export default function Home() {
                 className="w-full object-fill"
                 width={600}
                 height={400}
+                loading="lazy"
               />
             </CarouselItem>
           </CarouselContent>

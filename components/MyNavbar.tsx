@@ -6,6 +6,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { User } from "@/interfaces"; // Import User type
 import { auth, db } from "@/app/firebase/firebase";
+import { SiFirefoxbrowser } from "react-icons/si";
 import {
   Menubar,
   MenubarContent,
@@ -72,12 +73,13 @@ const MyNavbar = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-zinc-800 text-white py-4 z-50 shadow-md">
+    <header className="fixed top-0 left-0 w-full bg-zinc-800 text-white py-4 z-50 shadow-md flex">
       <div className="container mx-auto flex justify-between items-center px-4">
-        <div className="text-orange-500 text-2xl font-bold">
+        <div className="text-orange-500 text-2xl font-bold flex gap-3">
           <Link href="/" className="text-orange-500">
             FoxOrient
           </Link>
+          <SiFirefoxbrowser className="mt-1" />
         </div>
 
         <Menubar className="hidden md:flex space-x-6 ml-auto bg-zinc-800 border-none">

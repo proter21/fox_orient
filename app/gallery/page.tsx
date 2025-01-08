@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import MyNavbar from "@/components/MyNavbar"; // ако имаш компонент за Navbar
 import MyFooter from "@/components/MyFooter"; // ако имаш компонент за Footer
 
@@ -12,6 +13,8 @@ const GalleryPage: React.FC = () => {
   const events = [
     {
       title: "Състезание 1: Световен шампионат 2022",
+      date: "12.08.2022",
+      location: "Чехия",
       mainImage: "/images/WorldChampChec2024.jpg", // Главна снимка на събитието
       images: [
         "/images/evr2022.WorldChampChec2024",
@@ -23,6 +26,8 @@ const GalleryPage: React.FC = () => {
     },
     {
       title: "Състезание 2: Национален турнир 2023",
+      date: "15.05.2023",
+      location: "България",
       mainImage: "/images/photo7.jpg", // Главна снимка на събитието
       images: [
         "/images/photo8.jpg",
@@ -34,6 +39,8 @@ const GalleryPage: React.FC = () => {
     },
     {
       title: "Състезание 3: Турнир в Парк Витоша",
+      date: "20.09.2023",
+      location: "София, България",
       mainImage: "/images/WorldChamp2022.jpg", // Главна снимка на събитието
       images: [
         "/images/photo14.jpg",
@@ -50,7 +57,7 @@ const GalleryPage: React.FC = () => {
       <MyNavbar />
 
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold text-center pt-10 mb-8 text-orange-500">
+        <h1 className="text-4xl font-bold text-center pt-10 mb-8 text-orange-500">
           Галерия
         </h1>
 
@@ -58,21 +65,28 @@ const GalleryPage: React.FC = () => {
         <div className="flex flex-wrap justify-center gap-8">
           {events.map((event, eventIndex) => (
             <div key={eventIndex} className="w-full md:w-1/3 p-4">
-              {/* Надпис за събитието */}
-              <h2 className="text-2xl font-semibold text-center mb-4">
-                {event.title}
-              </h2>
-
-              {/* Главна снимка на събитието */}
-              <img
-                src={event.mainImage}
-                alt={`Главна снимка за ${event.title}`}
-                className="w-full h-60 object-cover rounded-lg shadow-md cursor-pointer"
-                onClick={() => {
-                  setSelectedEvent(eventIndex); // Записваме кой е избраният събитие
-                  setSelectedImageIndex(0); // Започваме с първата снимка на събитието
-                }}
-              />
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                <Image
+                  src={event.mainImage}
+                  alt={`Главна снимка за ${event.title}`}
+                  width={500}
+                  height={240}
+                  className="w-full h-60 object-cover cursor-pointer"
+                  onClick={() => {
+                    setSelectedEvent(eventIndex); // Записваме кой е избраният събитие
+                    setSelectedImageIndex(0); // Започваме с първата снимка на събитието
+                  }}
+                />
+                <div className="p-4">
+                  {/* Надпис за събитието */}
+                  <h2 className="text-2xl font-semibold text-center mb-2">
+                    {event.title}
+                  </h2>
+                  <p className="text-center text-gray-600">
+                    {event.date} - {event.location}
+                  </p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -80,23 +94,20 @@ const GalleryPage: React.FC = () => {
         {/* Модален прозорец за показване на всички снимки от събитието */}
         {selectedEvent !== null && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50"
             onClick={() => setSelectedEvent(null)} // Затваря модала при клик върху фона
           >
-            <div className="relative max-w-5xl max-h-full">
+            <div className="relative bg-white rounded-lg shadow-lg max-w-5xl max-h-full overflow-auto">
               {/* Бутон за затваряне на модала */}
               <button
-                className="absolute top-4 right-4 text-white bg-gray-800 p-3 rounded-full text-3xl"
-                onClick={() => setSelectedEvent(null)} // Затваря модала при клик върху бутона
+                className="absolute top-4 right-4 text-gray-800 bg-gray-200 p-2 rounded-full text-2xl"
+                onClick={() => setSelectedEvent(null)} // Затваря модала
               >
-                &times; {/* Иконка за затваряне */}
+                &times;
               </button>
-
-              {/* Преглед на снимките на събитието */}
-              <div className="flex justify-center items-center space-x-4">
-                {/* Ляв бутон за предишна снимка */}
+              <div className="flex justify-center items-center space-x-4 p-4">
                 <button
-                  className="text-white text-4xl"
+                  className="text-gray-800 text-4xl"
                   onClick={() =>
                     setSelectedImageIndex(
                       (selectedImageIndex +
@@ -108,17 +119,15 @@ const GalleryPage: React.FC = () => {
                 >
                   &#60;
                 </button>
-
-                {/* Избрана снимка от галерията */}
-                <img
+                <Image
                   src={events[selectedEvent].images[selectedImageIndex]}
                   alt="Избрана снимка"
+                  width={800}
+                  height={600}
                   className="w-full max-w-screen-lg h-auto rounded-lg shadow-xl"
                 />
-
-                {/* Десен бутон за следваща снимка */}
                 <button
-                  className="text-white text-4xl"
+                  className="text-gray-800 text-4xl"
                   onClick={() =>
                     setSelectedImageIndex(
                       (selectedImageIndex + 1) %
