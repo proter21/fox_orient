@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { User } from "@/interfaces"; // Import User type
+import { User } from "@/interfaces";
 import { auth, db } from "@/app/firebase/firebase";
 import { SiFirefoxbrowser } from "react-icons/si";
 import {
@@ -21,34 +21,40 @@ const MyNavbar = () => {
   const [userData, setUserData] = useState<User | null>(null);
   const [activeSubMenu, setActiveSubMenu] = useState<string | null>(null);
 
+  const fetchUserData = useCallback(async (uid: string) => {
+    try {
+      const userDocRef = doc(db, "users", uid);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+        setUserData(userDoc.data() as User);
+      } else {
+        console.error("No such user document!");
+      }
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+    }
+  }, []);
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser({
           fullName: currentUser.displayName || "",
           email: currentUser.email || "",
-          birthDate: "", // Placeholder if not available
+          birthDate: "",
           createdAt: currentUser.metadata.creationTime || "",
+          role: "",
+          ageGroup: "",
+          gender: "",
         });
-        // Fetch user document from Firestore
-        try {
-          const userDocRef = doc(db, "users", currentUser.uid);
-          const userDoc = await getDoc(userDocRef);
-          if (userDoc.exists()) {
-            setUserData(userDoc.data() as User);
-          } else {
-            console.error("No such user document!");
-          }
-        } catch (err) {
-          console.error("Error fetching user data:", err);
-        }
+        fetchUserData(currentUser.uid);
       } else {
         setUser(null);
         setUserData(null);
       }
     });
     return () => unsubscribe();
-  }, []);
+  }, [fetchUserData]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

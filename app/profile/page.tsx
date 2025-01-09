@@ -7,17 +7,16 @@ import { useRouter } from "next/navigation";
 import MyFooter from "@/components/MyFooter";
 import { auth, db } from "../firebase/firebase";
 import MyNavbar from "@/components/MyNavbar";
-
+import { User } from "@/interfaces";
+export const ageGroups = {
+  male: ["м14", "м16", "м19", "м21", "м40", "м50", "м60", "м70"],
+  female: ["ж14", "ж16", "ж19", "ж21", "ж35", "ж50"],
+};
 const ProfilePage: React.FC = () => {
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<User>();
   const [isAdmin, setIsAdmin] = useState(false);
   const [ageGroup, setAgeGroup] = useState("");
   const router = useRouter();
-
-  const ageGroups = {
-    male: ["m14", "m16", "m19", "m21", "m40", "m50", "m60", "m70"],
-    female: ["ж14", "ж16", "ж19", "ж21", "ж35", "ж50"],
-  };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -37,7 +36,7 @@ const ProfilePage: React.FC = () => {
           const userDocRef = doc(db, "users", currentUser.uid);
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
-            const data = userDoc.data();
+            const data = userDoc.data() as User;
             setUserData(data);
             setIsAdmin(data.role === "admin");
             setAgeGroup(data.ageGroup || "");
@@ -71,30 +70,32 @@ const ProfilePage: React.FC = () => {
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const selectedAgeGroup = event.target.value;
-    const birthDate = new Date(userData.birthDate);
-    const age = new Date().getFullYear() - birthDate.getFullYear();
+    if (userData) {
+      const birthDate = new Date(userData.birthDate);
+      const age = new Date().getFullYear() - birthDate.getFullYear();
 
-    const validAgeGroups = ageGroups[
-      userData.gender === "male" ? "male" : "female"
-    ].filter((group) => {
-      const groupAge = parseInt(group.replace(/\D/g, ""), 10);
-      if (age < 21) {
-        return groupAge <= 21 && groupAge >= age;
+      const validAgeGroups = ageGroups[
+        userData.gender === "male" ? "male" : "female"
+      ].filter((group) => {
+        const groupAge = parseInt(group.replace(/\D/g, ""), 10);
+        if (age < 21) {
+          return groupAge <= 21 && groupAge >= age;
+        } else {
+          return groupAge >= 21 && groupAge <= age;
+        }
+      });
+
+      if (validAgeGroups.includes(selectedAgeGroup)) {
+        setAgeGroup(selectedAgeGroup);
+        try {
+          const userDocRef = doc(db, "users", auth.currentUser!.uid);
+          await updateDoc(userDocRef, { ageGroup: selectedAgeGroup });
+        } catch (err) {
+          console.error("Error updating age group:", err);
+        }
       } else {
-        return groupAge >= 21 && groupAge <= age;
+        alert("Невалидна възрастова група за вашата възраст.");
       }
-    });
-
-    if (validAgeGroups.includes(selectedAgeGroup)) {
-      setAgeGroup(selectedAgeGroup);
-      try {
-        const userDocRef = doc(db, "users", auth.currentUser!.uid);
-        await updateDoc(userDocRef, { ageGroup: selectedAgeGroup });
-      } catch (err) {
-        console.error("Error updating age group:", err);
-      }
-    } else {
-      alert("Невалидна възрастова група за вашата възраст.");
     }
   };
 

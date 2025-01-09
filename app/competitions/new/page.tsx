@@ -1,0 +1,288 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import MyNavbar from "@/components/MyNavbar";
+import MyFooter from "@/components/MyFooter";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "@/app/firebase/firebase";
+import { ageGroups } from "@/app/profile/page";
+
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: "Name must be at least 2 characters.",
+  }),
+  date: z.string(),
+  time: z.string(),
+  location: z.string().min(2, {
+    message: "Location must be at least 2 characters.",
+  }),
+  entryFee: z.number().min(0),
+  ageGroups: z.array(z.string()),
+});
+
+export default function NewCompetitionPage() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      date: "",
+      time: "",
+      location: "",
+      entryFee: 0,
+      ageGroups: [],
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      // Add document to Firestore
+      await addDoc(collection(db, "competitions"), {
+        name: values.name,
+        date: values.date,
+        time: values.time,
+        location: values.location,
+        entryFee: values.entryFee,
+        ageGroups: values.ageGroups,
+        createdAt: new Date().toISOString(),
+      });
+
+      // Navigate back to competitions page
+      router.push("/competitions");
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to create competition:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <>
+      <MyNavbar />
+      <div className="min-h-screen bg-gray-100 text-gray-800 py-16">
+        <div className="container mx-auto">
+          <Card className="max-w-2xl mx-auto">
+            <CardHeader>
+              <CardTitle className="text-3xl text-orange-500">
+                Създай ново състезание
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Име на състезанието</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="date"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Дата</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="time"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Първи старт</FormLabel>
+                          <FormControl>
+                            <Input type="time" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Местоположение</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="entryFee"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Такса за участие (€)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="0"
+                            {...field}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => field.onChange(Number(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="ageGroups"
+                    render={() => (
+                      <FormItem>
+                        <FormLabel>Възрастови групи</FormLabel>
+                        <div className="grid grid-cols-2 gap-8">
+                          <div>
+                            <h3 className="font-semibold">Мъже</h3>
+                            {ageGroups.male
+                              .sort((a, b) =>
+                                a.localeCompare(b, undefined, { numeric: true })
+                              )
+                              .map((group) => (
+                                <div
+                                  key={group}
+                                  className="flex items-center space-x-2"
+                                >
+                                  <Checkbox
+                                    checked={form
+                                      .getValues("ageGroups")
+                                      .includes(group)}
+                                    onCheckedChange={(checked: boolean) => {
+                                      const currentGroups =
+                                        form.getValues("ageGroups");
+                                      if (checked) {
+                                        form.setValue("ageGroups", [
+                                          ...currentGroups,
+                                          group,
+                                        ]);
+                                      } else {
+                                        form.setValue(
+                                          "ageGroups",
+                                          currentGroups.filter(
+                                            (g: string) => g !== group
+                                          )
+                                        );
+                                      }
+                                    }}
+                                  />
+                                  <Label className="text-base">
+                                    Група {group}
+                                  </Label>
+                                </div>
+                              ))}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold">Жени</h3>
+                            {ageGroups.female
+                              .sort((a, b) =>
+                                a.localeCompare(b, undefined, { numeric: true })
+                              )
+                              .map((group) => (
+                                <div
+                                  key={group}
+                                  className="flex items-center space-x-2"
+                                >
+                                  <Checkbox
+                                    checked={form
+                                      .getValues("ageGroups")
+                                      .includes(group)}
+                                    onCheckedChange={(checked: boolean) => {
+                                      const currentGroups =
+                                        form.getValues("ageGroups");
+                                      if (checked) {
+                                        form.setValue("ageGroups", [
+                                          ...currentGroups,
+                                          group,
+                                        ]);
+                                      } else {
+                                        form.setValue(
+                                          "ageGroups",
+                                          currentGroups.filter(
+                                            (g: string) => g !== group
+                                          )
+                                        );
+                                      }
+                                    }}
+                                  />
+                                  <Label className="text-base">
+                                    Група {group}
+                                  </Label>
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="flex justify-end gap-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => router.push("/competitions")}
+                    >
+                      Отказ
+                    </Button>
+                    <Button type="submit" disabled={isLoading}>
+                      {isLoading ? "Създаване..." : "Създай състезание"}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+      <MyFooter />
+    </>
+  );
+}

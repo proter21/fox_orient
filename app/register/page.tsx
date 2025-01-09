@@ -8,6 +8,7 @@ import MyNavbar from "@/components/MyNavbar";
 import MyFooter from "@/components/MyFooter";
 import Link from "next/link";
 import { auth, db } from "../firebase/firebase";
+import { FaMale, FaFemale } from "react-icons/fa";
 
 export default function RegisterPage() {
   const [error, setError] = useState("");
@@ -25,6 +26,10 @@ export default function RegisterPage() {
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
     const birthDate = (form.elements.namedItem("birthDate") as HTMLInputElement)
       .value;
+    const gender =
+      (form.elements.namedItem("gender") as HTMLInputElement).value === "Мъж"
+        ? "male"
+        : "female";
     const password = (form.elements.namedItem("password") as HTMLInputElement)
       .value;
 
@@ -40,12 +45,18 @@ export default function RegisterPage() {
         fullName,
         email,
         birthDate,
+        gender,
         createdAt: new Date().toISOString(),
       });
 
+      await auth.signOut(); // Sign out the user after registration
       router.push("/login");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred");
+      }
     } finally {
       setLoading(false);
     }
@@ -112,6 +123,47 @@ export default function RegisterPage() {
                   required
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
+              </div>
+              <div className="form-group mb-4">
+                <label className="block text-lg font-bold mb-2 text-gray-700">
+                  Пол
+                </label>
+                <div className="flex items-center mb-4 space-x-16">
+                  {" "}
+                  {/* Add more space between options */}
+                  <div className="gender-radio flex items-center">
+                    <input
+                      type="radio"
+                      id="male"
+                      name="gender"
+                      value="Мъж"
+                      required
+                      className="mr-2"
+                    />
+                    <label
+                      htmlFor="male"
+                      className="text-gray-700 flex items-center"
+                    >
+                      <FaMale className="mr-1" /> Мъж
+                    </label>
+                  </div>
+                  <div className="gender-radio flex items-center">
+                    <input
+                      type="radio"
+                      id="female"
+                      name="gender"
+                      value="Жена"
+                      required
+                      className="mr-2"
+                    />
+                    <label
+                      htmlFor="female"
+                      className="text-gray-700 flex items-center"
+                    >
+                      <FaFemale className="mr-1" /> Жена
+                    </label>
+                  </div>
+                </div>
               </div>
               <div className="form-group mb-6">
                 <label
