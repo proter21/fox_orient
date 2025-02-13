@@ -4,9 +4,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { User } from "@/interfaces";
+import type { User } from "@/interfaces";
 import { auth, db } from "@/app/firebase/firebase";
 import { SiFirefoxbrowser } from "react-icons/si";
+import { BiSolidRightArrow } from "react-icons/bi";
 import {
   Menubar,
   MenubarContent,
@@ -14,6 +15,7 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "@/components/ui/menubar";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MyNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,8 +25,7 @@ const MyNavbar = () => {
 
   const fetchUserData = useCallback(async (uid: string) => {
     try {
-      const userDocRef = doc(db, "users", uid);
-      const userDoc = await getDoc(userDocRef);
+      const userDoc = await getDoc(doc(db, "users", uid));
       if (userDoc.exists()) {
         setUserData(userDoc.data() as User);
       } else {
@@ -39,6 +40,7 @@ const MyNavbar = () => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser({
+          id: currentUser.uid,
           fullName: currentUser.displayName || "",
           email: currentUser.email || "",
           birthDate: "",
@@ -58,6 +60,7 @@ const MyNavbar = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+    if (activeSubMenu) setActiveSubMenu(null);
   };
 
   const handleLogout = async () => {
@@ -74,12 +77,18 @@ const MyNavbar = () => {
     setActiveSubMenu(activeSubMenu === menu ? null : menu);
   };
 
-  const goBack = () => {
-    setActiveSubMenu(null);
+  const menuVariants = {
+    closed: { opacity: 0, x: "100%" },
+    open: { opacity: 1, x: 0 },
+  };
+
+  const subMenuVariants = {
+    closed: { opacity: 0, height: 0 },
+    open: { opacity: 1, height: "auto" },
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-zinc-800 text-white py-4 z-50 shadow-md flex">
+    <header className="fixed top-0 left-0 w-full bg-zinc-800 text-white py-4 z-50 shadow-md">
       <div className="container mx-auto flex justify-between items-center px-4">
         <div className="text-orange-500 text-2xl font-bold flex gap-3">
           <Link href="/" className="text-orange-500">
@@ -108,6 +117,14 @@ const MyNavbar = () => {
                   className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
                 >
                   Резултати
+                </Link>
+              </MenubarItem>
+              <MenubarItem asChild>
+                <Link
+                  href="/competitions"
+                  className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                >
+                  Състезания
                 </Link>
               </MenubarItem>
             </MenubarContent>
@@ -171,6 +188,14 @@ const MyNavbar = () => {
                   Състезатели
                 </Link>
               </MenubarItem>
+              <MenubarItem asChild>
+                <Link
+                  href="/ardf"
+                  className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
+                >
+                  АРДФ
+                </Link>
+              </MenubarItem>
             </MenubarContent>
           </MenubarMenu>
           <MenubarMenu>
@@ -230,17 +255,17 @@ const MyNavbar = () => {
           >
             <div
               className={`w-6 h-0.5 bg-orange-500 block transition-all duration-300 ease-in-out ${
-                isMenuOpen ? "rotate-45 translate-y-1" : ""
+                isMenuOpen ? "rotate-45 translate-y-1.5" : ""
               }`}
             ></div>
             <div
-              className={`w-6 h-0.5 bg-orange-500 block transition-all duration-300 ease-in-out ${
+              className={`w-6 h-0.5 bg-orange-500 block my-1 transition-all duration-300 ease-in-out ${
                 isMenuOpen ? "opacity-0" : ""
               }`}
             ></div>
             <div
               className={`w-6 h-0.5 bg-orange-500 block transition-all duration-300 ease-in-out ${
-                isMenuOpen ? "-rotate-45 translate-y-[-1px]" : ""
+                isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
               }`}
             ></div>
           </button>
@@ -248,183 +273,243 @@ const MyNavbar = () => {
       </div>
 
       {/* Responsive меню */}
-      <nav
-        className={`${
-          isMenuOpen ? "translate-x-0" : "translate-x-full"
-        } fixed top-0 right-0 w-7/8 bg-zinc-800 mt-16 text-white h-full md:hidden transition-all duration-300 ease-in-out`}
-      >
-        {activeSubMenu ? (
-          <div className="space-y-4 p-4 text-sm my-8">
-            <button
-              className="block w-full text-left px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 text-white rounded"
-              onClick={goBack}
-            >
-              Назад
-            </button>
-            <ul className="space-y-4">
-              {activeSubMenu === "functions" && (
-                <>
-                  <li>
-                    <Link
-                      href="/classes"
-                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Класове
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/results"
-                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Резултати
-                    </Link>
-                  </li>
-                </>
-              )}
-              {activeSubMenu === "events" && (
-                <>
-                  <li>
-                    <Link
-                      href="/calendar"
-                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Календар
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/news"
-                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Новини
-                    </Link>
-                  </li>
-                </>
-              )}
-              {activeSubMenu === "gallery" && (
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.nav
+            className="fixed top-0 right-0 w-3/5 max-w-xs bg-zinc-800 h-full md:hidden overflow-y-auto shadow-lg"
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={menuVariants}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <div className="p-4 pt-16">
+              <button
+                className="text-3xl text-orange-500 mb-4 transition-colors duration-300 hover:text-orange-400"
+                onClick={toggleMenu}
+                aria-label="Close menu"
+              >
+                &times;
+              </button>
+              <ul className="space-y-4">
                 <li>
-                  <Link
-                    href="/gallery"
-                    className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
-                    onClick={() => setIsMenuOpen(false)}
+                  <button
+                    className="w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:outline-none"
+                    onClick={() => toggleSubMenu("functions")}
                   >
-                    Галерия
-                  </Link>
-                </li>
-              )}
-              {activeSubMenu === "about" && (
-                <>
-                  <li>
-                    <Link
-                      href="/about"
-                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Кои сме ние
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/competitors"
-                      className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Състезатели
-                    </Link>
-                  </li>
-                </>
-              )}
-            </ul>
-          </div>
-        ) : (
-          <ul className="space-y-4 p-4 text-sm my-8">
-            <li>
-              <button
-                className="block w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:bg-orange-600"
-                onClick={() => toggleSubMenu("functions")}
-              >
-                Функции <span className="float-right">{">"}</span>
-              </button>
-            </li>
-            <li>
-              <button
-                className="block w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:bg-orange-600"
-                onClick={() => toggleSubMenu("events")}
-              >
-                Събития <span className="float-right">{">"}</span>
-              </button>
-            </li>
-            <li>
-              <button
-                className="block w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:bg-orange-600"
-                onClick={() => toggleSubMenu("gallery")}
-              >
-                Галерия <span className="float-right">{">"}</span>
-              </button>
-            </li>
-            <li>
-              <button
-                className="block w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:bg-orange-600"
-                onClick={() => toggleSubMenu("about")}
-              >
-                За нас <span className="float-right">{">"}</span>
-              </button>
-            </li>
-            {user ? (
-              <>
-                <li>
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 text-white rounded"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Профил
-                  </Link>
+                    Функции {activeSubMenu === "functions" ? "▼" : "▶"}
+                  </button>
+                  <AnimatePresence>
+                    {activeSubMenu === "functions" && (
+                      <motion.ul
+                        className="ml-4 mt-2 space-y-2"
+                        initial="closed"
+                        animate="open"
+                        exit="closed"
+                        variants={subMenuVariants}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <li>
+                          <Link
+                            href="/classes"
+                            className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
+                            onClick={toggleMenu}
+                          >
+                            Класове
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href="/results"
+                            className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
+                            onClick={toggleMenu}
+                          >
+                            Резултати
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href="/competitions"
+                            className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
+                            onClick={toggleMenu}
+                          >
+                            Състезания
+                          </Link>
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
                 <li>
                   <button
-                    className="block w-full text-left px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 text-white rounded"
-                    onClick={() => {
-                      handleLogout();
-                      setIsMenuOpen(false);
-                    }}
+                    className="w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:outline-none"
+                    onClick={() => toggleSubMenu("events")}
                   >
-                    Изход
+                    Събития {activeSubMenu === "events" ? "▼" : "▶"}
                   </button>
+                  <AnimatePresence>
+                    {activeSubMenu === "events" && (
+                      <motion.ul
+                        className="ml-4 mt-2 space-y-2"
+                        initial="closed"
+                        animate="open"
+                        exit="closed"
+                        variants={subMenuVariants}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <li>
+                          <Link
+                            href="/calendar"
+                            className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
+                            onClick={toggleMenu}
+                          >
+                            Календар
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href="/news"
+                            className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
+                            onClick={toggleMenu}
+                          >
+                            Новини
+                          </Link>
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
-              </>
-            ) : (
-              <>
                 <li>
-                  <Link
-                    href="/login"
-                    className="block px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 text-white rounded"
-                    onClick={() => setIsMenuOpen(false)}
+                  <button
+                    className="w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:outline-none"
+                    onClick={() => toggleSubMenu("gallery")}
                   >
-                    Вход
-                  </Link>
+                    Галерия {activeSubMenu === "gallery" ? "▼" : "▶"}
+                  </button>
+                  <AnimatePresence>
+                    {activeSubMenu === "gallery" && (
+                      <motion.ul
+                        className="ml-4 mt-2 space-y-2"
+                        initial="closed"
+                        animate="open"
+                        exit="closed"
+                        variants={subMenuVariants}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <li>
+                          <Link
+                            href="/gallery"
+                            className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
+                            onClick={toggleMenu}
+                          >
+                            Галерия
+                          </Link>
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
                 <li>
-                  <Link
-                    href="/register"
-                    className="block px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 text-white rounded"
-                    onClick={() => setIsMenuOpen(false)}
+                  <button
+                    className="w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:outline-none"
+                    onClick={() => toggleSubMenu("about")}
                   >
-                    Регистрирай се
-                  </Link>
+                    За нас{" "}
+                    {activeSubMenu === "about" ? "▼" : <BiSolidRightArrow />}
+                  </button>
+                  <AnimatePresence>
+                    {activeSubMenu === "about" && (
+                      <motion.ul
+                        className="ml-4 mt-2 space-y-2"
+                        initial="closed"
+                        animate="open"
+                        exit="closed"
+                        variants={subMenuVariants}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <li>
+                          <Link
+                            href="/about"
+                            className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
+                            onClick={toggleMenu}
+                          >
+                            Кои сме ние
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href="/competitors"
+                            className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
+                            onClick={toggleMenu}
+                          >
+                            Състезатели
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href="/ardf"
+                            className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
+                            onClick={toggleMenu}
+                          >
+                            АРДФ
+                          </Link>
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
-              </>
-            )}
-          </ul>
+                {user ? (
+                  <>
+                    <li>
+                      <Link
+                        href="/profile"
+                        className="block px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 text-white rounded"
+                        onClick={toggleMenu}
+                      >
+                        Профил
+                      </Link>
+                    </li>
+                    <li>
+                      <button
+                        className="w-full text-left px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 text-white rounded"
+                        onClick={() => {
+                          handleLogout();
+                          toggleMenu();
+                        }}
+                      >
+                        Изход
+                      </button>
+                    </li>
+                  </>
+                ) : (
+                  <>
+                    <li>
+                      <Link
+                        href="/login"
+                        className="block px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 text-white rounded"
+                        onClick={toggleMenu}
+                      >
+                        Вход
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/register"
+                        className="block px-4 py-2 bg-orange-500 hover:bg-orange-600 transition duration-300 text-white rounded"
+                        onClick={toggleMenu}
+                      >
+                        Регистрирай се
+                      </Link>
+                    </li>
+                  </>
+                )}
+              </ul>
+            </div>
+          </motion.nav>
         )}
-      </nav>
+      </AnimatePresence>
     </header>
   );
 };
 
-export default MyNavbar;
+export default React.memo(MyNavbar);

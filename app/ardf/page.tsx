@@ -1,152 +1,150 @@
-"use client";
-
-import React from "react";
+import type React from "react";
 import Image from "next/image";
-import MyNavbar from "@/components/MyNavbar"; // ако имаш компонент за Navbar
-import MyFooter from "@/components/MyFooter"; // ако имаш компонент за Footer
+import Link from "next/link";
 
 const ArdfPage: React.FC = () => {
   return (
-    <div>
-      {/* Navbar */}
-      <MyNavbar />
-
-      <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-center pt-12 mb-8 text-orange-500">
+    <div className="bg-gray-100 py-12">
+      <div className="container mx-auto px-4">
+        <h1 className="text-4xl font-bold text-center mb-12 text-orange-500">
           Какво е ARDF?
         </h1>
-        <section className="mb-12">
-          <p className="text-lg leading-relaxed mb-4">
-            Радиозасичането ( ARDF ) е спорт, който обединява умения за
-            откриване на радиопредаватели, посредством използването на апаратура
-            (приемник ) за локализирането им, и умения за боравене с карта и
-            компас и ориентиране, голяма роля за крайното класиране играе и
-            физическото състояние на състезателя (визиращо бързото придвижване
-            между отделните предаватели). Това е времево ориентирано състезание
-            , в което състезателите се състезават помежду си, като този който е
-            избрал най-краткия маршрут по който би могъл да намери (
-            &quot;събере&quot; ) всички предаватели ( наричани още
-            &quot;лисици&quot;, от където идва и другото име на спорта &quot;Лов
-            на лисици&quot; ). Спортът е най-популярен в Европа,
-            Китай,Казакстан, Япония, като в голяма част от тези страни е част от
-            физкултурната програма на образователната система.
-          </p>
-          <h1 className="text-zinc-900 p-4 rounded-lg text-2xl font-bold mb-2">
-            История:
-          </h1>
-          <p className="text-lg leading-relaxed mb-4">
-            Радиозасичането първоначално възниква в страните от Източна Европа в
-            края на 1950 г. Популярността на спорта расте лавинообразно, като до
-            1970 г. вече има проведени няколко Европейски първенства, а през
-            1980 г. се провежда първото Световно първенсто в Полша, където
-            участие взимат състезатели от цяла Европа и Азия. През 1990 г. САЩ
-            се присъединяват към голямото семейство на радиозасичането, а през
-            2000 г. се състоя и първото Световно първенстово проведено извън
-            Европа - в Китай. С всяка година расте броят на състезателите на
-            големите форуми, като на Световното първенсто през 2004 г. в Чехия
-            участие вземат 400 човека от 29 страни, а на Световно първенство в
-            България през 2006 г. участие вземат над 500 състезатели от 32
-            държави на четири континента.
-          </p>
-          <h1 className="text-zinc-900 p-4 rounded-lg text-2xl font-bold mb-2">
-            Правилата:
-          </h1>
-          <p className="text-lg leading-relaxed mb-4">
-            Правилата на спорта са еднакви във всички страни, с малки промени в
-            някои от тях, които са одобрени от работната група на IARU .
-            Състезанията по радиозасичане се провеждат както в пресечен терен,
-            така и в градски паркове включително и населени места ( основно с
-            цел популяризиране на спорта ). Всеки състезател получава подробна
-            топографска карта на района на състезанието с отбелязани на нея
-            единствено Старт ( отбелязан на картата с триъгълник) и Финал (
-            отболязан на картата с два концентрични кръга ). Местоположението на
-            предавателите ( лисиците ) не се отбелязва на картата и е неизвестно
-            за състезателите. Всеки предавател излъчва сигнал посредством
-            Морзова азбука, като сигнала на предавателите е различен и по този
-            начин състезателите разграничават и разпознават предавателите.
-            Предавателите са 5 на брой ( плюс 1 финален, намиращ се в началото
-            на финалния коридор ) и работят в т.н. &quot;цикъл&quot;, всеки
-            предавател излъчва 1 минута след това 4 почива и след това отново
-            излъчва и се получава работен цикъл от 5 мин , в които всеки
-            предавател излъчва сигнала си по 1 път. В зависимост от възрастовата
-            група състезателя трябва да намери 2,3,4 или всичките 5 предавателя
-            и след това по възможно най-краткият път да достигне до финалната
-            линия. Състезанието се провежда на два различни обхвата в различни
-            дни - &quot;два метра&quot; 144 MHz и &quot;осемдесет метра&quot;
-            3,5 MHz, като за различните обхвати се използват различни приемници.
-          </p>
-          <h1 className="text-zinc-900 p-4 rounded-lg text-2xl font-bold mb-2">
-            Възрастови групи:
-          </h1>
-          <ul className="list-disc pl-6 space-y-2">
-            <li>М19 - Мъже на възраст 19 г. и по-млади, 4 предавателя</li>
-            <li>М21 - Мъже на всяка възраст, 5 предавателя</li>
-            <li>М40 - Мъже на възраст 40 г. и по-възрастни, 4 предавателя</li>
-            <li>М50 - Mъже възраст от 50 г. и по-възрастни, 4 предавателя</li>
-            <li>М60 - Мъже възраст 60 г. и по-възрастни, 3 предавателя </li>
-            <li>М70 - Мъже възраст 70 г. и по-възрастни, 3 предавателя</li>
-            <li>Ж19 - жени на възраст 19 г. и по-млади, 4 предавателя</li>
-            <li>Ж21 - жени от всяка възраст, 4 предавателя</li>
-            <li>Ж35 - жени на възраст 35 г. години, 4 предавателя</li>
-            <li>Ж50 - жени на възраст 50 г. и по-възрастни, 3 предавателя</li>
-            <li>Ж60 - жени на възраст 60 г. и по-възрастни, 3 предавателя</li>
-          </ul>
-        </section>
 
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4">Гледайте видеото</h2>
-          <div className="aspect-w-16 aspect-h-9 mb-8">
-            <iframe
-              width="560"
-              height="315"
-              src="https://www.youtube.com/embed/-47IqZ7p8I0?start=171"
-              title="ARDF Introduction"
-              frameBorder="0"
-              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          <div>
+            <h2 className="text-2xl font-bold mb-4">
+              Въведение в радиозасичането
+            </h2>
+            <p className="text-lg leading-relaxed mb-4">
+              Радиозасичането (ARDF) е вълнуващ спорт, който съчетава умения за
+              ориентиране, физическа издръжливост и техническо познание.
+              Състезателите използват специални приемници, за да локализират
+              скрити радиопредаватели в непозната местност, като същевременно се
+              състезават с времето и помежду си.
+            </p>
+            <Link
+              href="#learn-more"
+              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors inline-block"
+            >
+              Научете повече
+            </Link>
           </div>
-        </section>
+          <div className="relative h-64 md:h-auto rounded-lg overflow-hidden">
+            <Image
+              src="/images/ardf-action.jpg"
+              alt="ARDF в действие"
+              fill
+              className="object-cover"
+            />
+          </div>
+        </div>
 
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">
-            Снимки от ARDF събития
+        <div
+          className="bg-white p-6 rounded-lg shadow-lg mb-12"
+          id="learn-more"
+        >
+          <h2 className="text-2xl font-bold mb-4">История на ARDF</h2>
+          <p className="text-lg leading-relaxed mb-4">
+            Радиозасичането възниква в края на 1950-те години в Източна Европа.
+            Бързо набира популярност, като до 1980 г. се провежда първото
+            Световно първенство в Полша. Днес ARDF е глобален спорт с участници
+            от цяла Европа, Азия, Северна Америка и други континенти.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-orange-500">1950</div>
+              <div className="text-sm">Възникване в Източна Европа</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-orange-500">1980</div>
+              <div className="text-sm">Първо Световно първенство</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-orange-500">1990</div>
+              <div className="text-sm">САЩ се присъединява</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-orange-500">2000+</div>
+              <div className="text-sm">Глобално разпространение</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-4">Как работи ARDF?</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-xl font-semibold mb-2">1. Подготовка</h3>
+              <p>Състезателите получават карта и специален радиоприемник.</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-xl font-semibold mb-2">2. Откриване</h3>
+              <p>Използват приемника за локализиране на скрити предаватели.</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-xl font-semibold mb-2">3. Финиширане</h3>
+              <p>
+                Състезателите трябва да открият всички предаватели възможно
+                най-бързо.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-4">Възрастови групи</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full bg-white shadow-lg rounded-lg">
+              <thead className="bg-orange-500 text-white">
+                <tr>
+                  <th className="p-3 text-left">Група</th>
+                  <th className="p-3 text-left">Възраст</th>
+                  <th className="p-3 text-left">Брой предаватели</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b">
+                  <td className="p-3">М19</td>
+                  <td className="p-3">19 г. и по-млади</td>
+                  <td className="p-3">4</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="p-3">М21</td>
+                  <td className="p-3">Всяка възраст</td>
+                  <td className="p-3">5</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="p-3">М40</td>
+                  <td className="p-3">40 г. и по-възрастни</td>
+                  <td className="p-3">4</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="p-3">Ж19</td>
+                  <td className="p-3">19 г. и по-млади</td>
+                  <td className="p-3">4</td>
+                </tr>
+                <tr>
+                  <td className="p-3">Ж21</td>
+                  <td className="p-3">Всяка възраст</td>
+                  <td className="p-3">4</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-6">
+            Готови ли сте за предизвикателството?
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            <Image
-              src="/images/evr2022.jpg"
-              alt="Снимка 1 от ARDF"
-              width={300}
-              height={300}
-              className="w-full h-56 object-cover rounded-lg shadow-md"
-            />
-            <Image
-              src="/images/TroianDP2022.jpg"
-              alt="Снимка 2 от ARDF"
-              width={300}
-              height={300}
-              className="w-full h-56 object-cover rounded-lg shadow-md"
-            />
-            <Image
-              src="/images/WorldChamp2022.jpg"
-              alt="Снимка 3 от ARDF"
-              width={300}
-              height={300}
-              className="w-full h-56 object-cover rounded-lg shadow-md"
-            />
-            <Image
-              src="/images/ardf4.jpg"
-              alt="Снимка 4 от ARDF"
-              width={300}
-              height={300}
-              className="w-full h-56 object-cover rounded-lg shadow-md"
-            />
-          </div>
-        </section>
+          <Link
+            href="/competitions"
+            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg transition-colors inline-block"
+          >
+            Запишете се за състезание
+          </Link>
+        </div>
       </div>
-
-      {/* Footer */}
-      <MyFooter />
     </div>
   );
 };

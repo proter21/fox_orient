@@ -1,21 +1,33 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { auth } from "@/app/firebase/firebase";
+
+interface SignUpButtonProps {
+  competitionId: string;
+  buttonText?: string;
+}
 
 export default function SignUpButton({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   competitionId,
-}: {
-  competitionId: string;
-}) {
+  buttonText = "Sign Up",
+}: SignUpButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   async function handleSignUp() {
     setIsLoading(true);
     try {
+      const user = auth.currentUser;
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+
       // Replace with your actual signup logic
       await new Promise((resolve) => setTimeout(resolve, 1000));
       toast({
@@ -35,7 +47,7 @@ export default function SignUpButton({
 
   return (
     <Button onClick={handleSignUp} disabled={isLoading}>
-      {isLoading ? "Signing up..." : "Sign Up"}
+      {isLoading ? "Signing up..." : buttonText}
     </Button>
   );
 }

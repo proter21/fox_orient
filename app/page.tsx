@@ -1,9 +1,5 @@
-"use client";
 import Image from "next/image";
 import Link from "next/link";
-import Autoplay from "embla-carousel-autoplay";
-import MyNavbar from "@/components/MyNavbar";
-import MyFooter from "@/components/MyFooter";
 import {
   Carousel,
   CarouselContent,
@@ -11,69 +7,96 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { db } from "@/app/firebase/firebase";
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+} from "firebase/firestore";
+import type { Competition } from "@/interfaces";
 
-export default function Home() {
+const features = [
+  {
+    title: "Лесно управление на състезанията",
+    description:
+      "Организирайте събития и управлявайте записванията бързо и лесно.",
+  },
+  {
+    title: "Следете класациите на живо",
+    description: "Реално време резултати и класации за всички състезатели.",
+  },
+  {
+    title: "Карти и ориентиране",
+    description:
+      "Достъп до интерактивни карти за по-лесно проследяване и навигация.",
+  },
+  {
+    title: "Сигурност и подкрепа",
+    description: "Проследяване и SOS функция за безопасност на участниците.",
+  },
+];
+
+async function getUpcomingCompetitions(): Promise<Competition[]> {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const competitionsRef = collection(db, "competitions");
+  const q = query(
+    competitionsRef,
+    where("date", ">=", today.toISOString()),
+    orderBy("date", "asc"),
+    limit(2)
+  );
+
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(
+    (doc) => ({ id: doc.id, ...doc.data() } as Competition)
+  );
+}
+
+export default async function Home() {
+  const upcomingCompetitions = await getUpcomingCompetitions();
+
   return (
-    <main>
-      <MyNavbar />
-
-      <section className="relative bg-zinc-800 text-white h-screen mt-16 flex items-center justify-center overflow-hidden">
-        <Carousel
-          plugins={[
-            Autoplay({
-              delay: 3000,
-            }),
-          ]}
-        >
+    <>
+      <section className="relative bg-zinc-800 text-white h-screen flex items-center justify-center overflow-hidden">
+        <Carousel className="w-full h-full" opts={{ loop: true }}>
           <CarouselContent>
-            <CarouselItem>
-              <Image
-                src="/images/WorldChamp2022.jpg"
-                alt="Снимка 1"
-                className="w-full object-cover"
-                width={400}
-                height={200}
-                quality={75}
-                priority={true}
-              />
-            </CarouselItem>
-            <CarouselItem>
-              <Image
-                src="https://i.ibb.co/NWhLhrb/World-Champ-Ceremony2022.jpg"
-                alt="Снимка 2"
-                className="w-full object-cover"
-                width={600}
-                height={400}
-                loading="lazy"
-              />
-            </CarouselItem>
-            <CarouselItem>
-              <Image
-                src="/images/evr2022.jpg"
-                alt="Снимка 3"
-                className="w-full object-fill"
-                width={600}
-                height={400}
-                loading="lazy"
-              />
-            </CarouselItem>
+            {[
+              "/images/WorldChamp2022.jpg",
+              "https://i.ibb.co/NWhLhrb/World-Champ-Ceremony2022.jpg",
+              "/images/evr2022.jpg",
+            ].map((src, index) => (
+              <CarouselItem key={index}>
+                <Image
+                  src={src || "/placeholder.svg"}
+                  alt={`Снимка ${index + 1}`}
+                  fill
+                  style={{ objectFit: "cover" }}
+                  priority={index === 0}
+                />
+              </CarouselItem>
+            ))}
           </CarouselContent>
           <CarouselPrevious />
           <CarouselNext />
         </Carousel>
 
-        {/* Overlay with text */}
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="text-center text-white px-4">
-            <h2 className="text-4xl font-bold mb-4">Добре дошли в FoxOrient</h2>
+            <h1 className="text-4xl font-bold mb-4">Добре дошли в FoxOrient</h1>
             <p className="text-lg mb-6">
               Интернет приложение за улеснена организация на състезания по
               спортно радиоориентиране.
             </p>
-            <Link href="/register">
-              <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded text-lg">
-                Започнете сега
-              </button>
+            <Link
+              href="/register"
+              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded text-lg transition-colors"
+            >
+              Започнете сега
             </Link>
           </div>
         </div>
@@ -84,70 +107,50 @@ export default function Home() {
         className="bg-gray-100 py-12 text-center text-gray-800"
       >
         <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold mb-6">
+          <h2 className="text-3xl font-bold mb-6">
             Основни функции на приложението
-          </h3>
+          </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white p-6 shadow rounded">
-              <h4 className="text-xl font-semibold mb-2">
-                Лесно управление на състезанията
-              </h4>
-              <p>
-                Организирайте събития и управлявайте записванията бързо и лесно.
-              </p>
-            </div>
-            <div className="bg-white p-6 shadow rounded">
-              <h4 className="text-xl font-semibold mb-2">
-                Следете класациите на живо
-              </h4>
-              <p>Реално време резултати и класации за всички състезатели.</p>
-            </div>
-            <div className="bg-white p-6 shadow rounded">
-              <h4 className="text-xl font-semibold mb-2">
-                Карти и ориентиране
-              </h4>
-              <p>
-                Достъп до интерактивни карти за по-лесно проследяване и
-                навигация.
-              </p>
-            </div>
-            <div className="bg-white p-6 shadow rounded">
-              <h4 className="text-xl font-semibold mb-2">
-                Сигурност и подкрепа
-              </h4>
-              <p>Проследяване и SOS функция за безопасност на участниците.</p>
-            </div>
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="bg-white p-6 shadow rounded transition-transform hover:scale-105"
+              >
+                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                <p>{feature.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       <section id="events" className="bg-white py-12 text-center text-gray-800">
         <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold mb-6">Предстоящи събития</h3>
+          <h2 className="text-3xl font-bold mb-6">Предстоящи събития</h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-gray-100 p-6 shadow rounded">
-              <h4 className="text-xl font-semibold mb-2">
-                Състезание в Парк „Витоша“
-              </h4>
-              <p className="mb-4">Дата: 10.11.2024 | Място: Парк „Витоша“</p>
-              <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded">
-                Регистрация
-              </button>
-            </div>
-            <div className="bg-gray-100 p-6 shadow rounded">
-              <h4 className="text-xl font-semibold mb-2">
-                Национален турнир в Стара Загора
-              </h4>
-              <p className="mb-4">Дата: 20.12.2024 | Място: Стара Загора</p>
-              <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded">
-                Регистрация
-              </button>
-            </div>
+            {upcomingCompetitions.map((competition) => (
+              <div
+                key={competition.id}
+                className="bg-gray-100 p-6 shadow rounded transition-transform hover:scale-105"
+              >
+                <h3 className="text-xl font-semibold mb-2">
+                  {competition.name}
+                </h3>
+                <p className="mb-4">
+                  Дата: {new Date(competition.date).toLocaleDateString()} |
+                  Място: {competition.location}
+                </p>
+                <Link
+                  href={`/competitions/${competition.id}/register`}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded transition-colors"
+                >
+                  Регистрация
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </section>
-
-      <MyFooter />
-    </main>
+    </>
   );
 }

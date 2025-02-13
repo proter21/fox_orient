@@ -1,81 +1,114 @@
 "use client";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast"; // Correct import path
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import MyNavbar from "@/components/MyNavbar";
-import MyFooter from "@/components/MyFooter";
 import Link from "next/link";
 import { auth, db } from "../firebase/firebase";
 import { FaMale, FaFemale } from "react-icons/fa";
 
 export default function RegisterPage() {
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const toast = useToast(); // Initialize useToast
 
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  const handleRegister = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setLoading(true);
 
-    const form = e.currentTarget;
-    const fullName = (form.elements.namedItem("fullName") as HTMLInputElement)
-      .value;
-    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-    const birthDate = (form.elements.namedItem("birthDate") as HTMLInputElement)
-      .value;
-    const gender =
-      (form.elements.namedItem("gender") as HTMLInputElement).value === "Мъж"
-        ? "male"
-        : "female";
-    const password = (form.elements.namedItem("password") as HTMLInputElement)
-      .value;
+      const form = e.currentTarget;
+      const fullName = (form.elements.namedItem("fullName") as HTMLInputElement)
+        .value;
+      const email = (form.elements.namedItem("email") as HTMLInputElement)
+        .value;
+      const birthDate = (
+        form.elements.namedItem("birthDate") as HTMLInputElement
+      ).value;
+      const gender =
+        (form.elements.namedItem("gender") as HTMLInputElement).value === "Мъж"
+          ? "male"
+          : "female";
+      const password = (form.elements.namedItem("password") as HTMLInputElement)
+        .value;
 
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-
-      await setDoc(doc(db, "users", user.uid), {
-        fullName,
-        email,
-        birthDate,
-        gender,
-        createdAt: new Date().toISOString(),
-      });
-
-      await auth.signOut(); // Sign out the user after registration
-      router.push("/login");
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unknown error occurred");
+      const birthDateObj = new Date(birthDate);
+      const today = new Date();
+      let age = today.getFullYear() - birthDateObj.getFullYear();
+      const monthDiff = today.getMonth() - birthDateObj.getMonth();
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDateObj.getDate())
+      ) {
+        age--;
       }
-    } finally {
-      setLoading(false);
-    }
-  };
+
+      if (age < 12) {
+        toast({
+          title: "Грешка",
+          description:
+            "Трябва да сте поне на 12 години, за да се регистрирате.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+          fullName,
+          email,
+          birthDate,
+          gender,
+          createdAt: new Date().toISOString(),
+        });
+
+        await auth.signOut(); // Sign out the user after registration
+        router.push("/login");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          toast({
+            title: "Грешка",
+            description: err.message,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: "Грешка",
+            description: "An unknown error occurred",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [router, toast]
+  );
 
   return (
     <main>
-      <MyNavbar />
       <section className="register py-12 my-12">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
             Регистрация
           </h2>
           <div className="form bg-white rounded-lg shadow-lg p-8 w-full max-w-md mx-auto">
-            {error && (
-              <div className="text-red-500 text-center mb-4 font-semibold">
-                {error}
-              </div>
-            )}
             <form id="registrationForm" onSubmit={handleRegister}>
               <div className="form-group mb-4">
                 <label
@@ -213,7 +246,6 @@ export default function RegisterPage() {
           </div>
         </div>
       </section>
-      <MyFooter />
     </main>
   );
 }

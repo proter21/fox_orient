@@ -2,20 +2,38 @@
 
 import React, { useState, useEffect } from "react";
 import { signOut } from "firebase/auth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import MyFooter from "@/components/MyFooter";
+import dynamic from "next/dynamic";
 import { auth, db } from "../firebase/firebase";
-import MyNavbar from "@/components/MyNavbar";
-import { User } from "@/interfaces";
+import { User, Competition } from "@/interfaces";
+import { useToast } from "@/hooks/use-toast";
+
+const MyNavbar = dynamic(() => import("@/components/MyNavbar"), { ssr: false });
+const MyFooter = dynamic(() => import("@/components/MyFooter"), { ssr: false });
+
 export const ageGroups = {
   male: ["м14", "м16", "м19", "м21", "м40", "м50", "м60", "м70"],
   female: ["ж14", "ж16", "ж19", "ж21", "ж35", "ж50"],
 };
+
 const ProfilePage: React.FC = () => {
   const [userData, setUserData] = useState<User>();
   const [isAdmin, setIsAdmin] = useState(false);
   const [ageGroup, setAgeGroup] = useState("");
+  const [pastCompetitions, setPastCompetitions] = useState<Competition[]>([]);
+  const [upcomingCompetitions, setUpcomingCompetitions] = useState<
+    Competition[]
+  >([]);
+  const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
@@ -40,6 +58,23 @@ const ProfilePage: React.FC = () => {
             setUserData(data);
             setIsAdmin(data.role === "admin");
             setAgeGroup(data.ageGroup || "");
+
+            const competitionsQuery = query(
+              collection(db, "competitions"),
+              where("participants", "array-contains", currentUser.uid)
+            );
+            const competitionsSnapshot = await getDocs(competitionsQuery);
+            const competitions = competitionsSnapshot.docs.map(
+              (doc) => ({ id: doc.id, ...doc.data() } as Competition)
+            );
+
+            const now = new Date();
+            setPastCompetitions(
+              competitions.filter((comp) => new Date(comp.date) < now)
+            );
+            setUpcomingCompetitions(
+              competitions.filter((comp) => new Date(comp.date) >= now)
+            );
           }
         }
       } catch (err) {
@@ -63,7 +98,7 @@ const ProfilePage: React.FC = () => {
   };
 
   const handleAdminPanelRedirect = () => {
-    router.push("/admin");
+    router.push("/adminpanel");
   };
 
   const handleAgeGroupChange = async (
@@ -94,7 +129,11 @@ const ProfilePage: React.FC = () => {
           console.error("Error updating age group:", err);
         }
       } else {
-        alert("Невалидна възрастова група за вашата възраст.");
+        toast({
+          title: "Невалидна възрастова група",
+          description: "Изберете валидна възрастова група за вашия възраст",
+          variant: "destructive",
+        });
       }
     }
   };
@@ -151,6 +190,40 @@ const ProfilePage: React.FC = () => {
                       </option>
                     ))}
                   </select>
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold mb-2">
+                    Предстоящи състезания
+                  </h2>
+                  {upcomingCompetitions.length === 0 ? (
+                    <p>Няма предстоящи състезания.</p>
+                  ) : (
+                    <ul className="list-disc list-inside">
+                      {upcomingCompetitions.map((comp) => (
+                        <li key={comp.id}>
+                          {comp.name} -{" "}
+                          {new Date(comp.date).toLocaleDateString()}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold mb-2">
+                    Минали състезания
+                  </h2>
+                  {pastCompetitions.length === 0 ? (
+                    <p>Няма минали състезания.</p>
+                  ) : (
+                    <ul className="list-disc list-inside">
+                      {pastCompetitions.map((comp) => (
+                        <li key={comp.id}>
+                          {comp.name} -{" "}
+                          {new Date(comp.date).toLocaleDateString()}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
                 {isAdmin && (
                   <button

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import MyNavbar from "@/components/MyNavbar";
@@ -8,26 +8,30 @@ import MyFooter from "@/components/MyFooter";
 import Link from "next/link";
 import { auth } from "../firebase/firebase";
 import { FirebaseError } from "firebase/app";
+
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push("/"); // Пренасочване към профила след успешен вход
-    } catch (error) {
-      if (error instanceof FirebaseError) {
-        setError(error.message); // Firebase error message
-      } else {
-        setError("Неизвестна грешка при влизането.");
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        router.push("/"); // Пренасочване към профила след успешен вход
+      } catch (error) {
+        if (error instanceof FirebaseError) {
+          setError(error.message); // Firebase error message
+        } else {
+          setError("Неизвестна грешка при влизането.");
+        }
       }
-    }
-  };
+    },
+    [email, password, router]
+  );
 
   return (
     <main>
