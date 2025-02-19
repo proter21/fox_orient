@@ -1,12 +1,4 @@
-import Image from "next/image";
 import Link from "next/link";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { db, auth } from "@/firebase/firebase";
 import {
   collection,
