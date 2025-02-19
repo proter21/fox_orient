@@ -1,9 +1,10 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db, auth } from "@/app/firebase/firebase";
 import type { Competition, User } from "@/interfaces";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { auth, db } from "@/firebase/firebase";
 
 export default function EditCompetitionPage({
   params: initialParams,
@@ -44,7 +46,11 @@ export default function EditCompetitionPage({
       }
 
       const competitionDoc = await getDoc(
-        doc(db, "competitions", unwrappedParams.id)
+        doc(
+          db,
+          "competitions",
+          typeof unwrappedParams?.id === "string" ? unwrappedParams.id : ""
+        )
       );
       if (competitionDoc.exists()) {
         setCompetition({

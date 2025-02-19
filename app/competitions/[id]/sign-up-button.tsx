@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { auth } from "@/app/firebase/firebase";
+import { auth } from "@/firebase/firebase";
 
 interface SignUpButtonProps {
   competitionId: string;

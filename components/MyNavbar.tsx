@@ -3,9 +3,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import type { User } from "@/interfaces";
-import { auth, db } from "@/app/firebase/firebase";
+import { doc, getDoc, DocumentData } from "firebase/firestore";
+import { auth, db } from "@/firebase/firebase";
 import { SiFirefoxbrowser } from "react-icons/si";
 import { BiSolidRightArrow } from "react-icons/bi";
 import {
@@ -19,15 +18,30 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const MyNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  interface User {
+    id: string;
+    fullName: string;
+    email: string;
+    birthDate: string;
+    createdAt: string;
+    role: string;
+    ageGroup: string;
+    gender: string;
+  }
+
   const [user, setUser] = useState<User | null>(null);
-  const [userData, setUserData] = useState<User | null>(null);
+  const [userData, setUserData] = useState<DocumentData | null>(null);
   const [activeSubMenu, setActiveSubMenu] = useState<string | null>(null);
 
-  const fetchUserData = useCallback(async (uid: string) => {
+  interface FetchUserData {
+    (uid: string): Promise<void>;
+  }
+
+  const fetchUserData: FetchUserData = useCallback(async (uid) => {
     try {
       const userDoc = await getDoc(doc(db, "users", uid));
       if (userDoc.exists()) {
-        setUserData(userDoc.data() as User);
+        setUserData(userDoc.data());
       } else {
         console.error("No such user document!");
       }
@@ -73,7 +87,11 @@ const MyNavbar = () => {
     }
   };
 
-  const toggleSubMenu = (menu: string) => {
+  interface ToggleSubMenu {
+    (menu: string): void;
+  }
+
+  const toggleSubMenu: ToggleSubMenu = (menu) => {
     setActiveSubMenu(activeSubMenu === menu ? null : menu);
   };
 
@@ -90,17 +108,22 @@ const MyNavbar = () => {
   return (
     <header className="fixed top-0 left-0 w-full bg-zinc-800 text-white py-4 z-50 shadow-md">
       <div className="container mx-auto flex justify-between items-center px-4">
-        <div className="text-orange-500 text-2xl font-bold flex gap-3">
+        <motion.div
+          className="text-orange-500 text-2xl font-bold flex gap-3"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <Link href="/" className="text-orange-500">
             FoxOrient
           </Link>
           <SiFirefoxbrowser className="mt-1" />
-        </div>
+        </motion.div>
 
         <Menubar className="hidden md:flex space-x-6 ml-auto bg-zinc-800 border-none">
           <MenubarMenu>
             <MenubarTrigger className="text-white hover:text-orange-400 transition duration-300 transform hover:scale-105 focus:bg-orange-600 rounded">
-              Функции
+              Състезания
             </MenubarTrigger>
             <MenubarContent className="bg-zinc-800 text-white shadow-lg w-48 mt-2 rounded">
               <MenubarItem asChild>
@@ -108,7 +131,7 @@ const MyNavbar = () => {
                   href="/classes"
                   className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
                 >
-                  Класове
+                  GPS
                 </Link>
               </MenubarItem>
               <MenubarItem asChild>
@@ -124,7 +147,7 @@ const MyNavbar = () => {
                   href="/competitions"
                   className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
                 >
-                  Състезания
+                  Запиши се
                 </Link>
               </MenubarItem>
             </MenubarContent>
@@ -246,8 +269,12 @@ const MyNavbar = () => {
           </MenubarMenu>
         </Menubar>
 
-        {/* Мобилно меню (burger) */}
-        <div className="relative md:hidden">
+        <motion.div
+          className="relative md:hidden"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <button
             className="p-4 text-4xl focus:outline-none transition-all duration-300 ease-in-out"
             onClick={toggleMenu}
@@ -269,10 +296,9 @@ const MyNavbar = () => {
               }`}
             ></div>
           </button>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Responsive меню */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.nav
@@ -294,10 +320,19 @@ const MyNavbar = () => {
               <ul className="space-y-4">
                 <li>
                   <button
-                    className="w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:outline-none"
+                    className="w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:outline-none flex justify-between items-center"
                     onClick={() => toggleSubMenu("functions")}
                   >
-                    Функции {activeSubMenu === "functions" ? "▼" : "▶"}
+                    Състезания
+                    <motion.div
+                      initial={{ rotate: 0 }}
+                      animate={{
+                        rotate: activeSubMenu === "functions" ? 90 : 0,
+                      }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <BiSolidRightArrow />
+                    </motion.div>
                   </button>
                   <AnimatePresence>
                     {activeSubMenu === "functions" && (
@@ -315,7 +350,7 @@ const MyNavbar = () => {
                             className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
                             onClick={toggleMenu}
                           >
-                            Класове
+                            GPS
                           </Link>
                         </li>
                         <li>
@@ -333,7 +368,7 @@ const MyNavbar = () => {
                             className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
                             onClick={toggleMenu}
                           >
-                            Състезания
+                            Запиши се
                           </Link>
                         </li>
                       </motion.ul>
@@ -342,10 +377,17 @@ const MyNavbar = () => {
                 </li>
                 <li>
                   <button
-                    className="w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:outline-none"
+                    className="w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:outline-none flex justify-between items-center"
                     onClick={() => toggleSubMenu("events")}
                   >
-                    Събития {activeSubMenu === "events" ? "▼" : "▶"}
+                    Събития
+                    <motion.div
+                      initial={{ rotate: 0 }}
+                      animate={{ rotate: activeSubMenu === "events" ? 90 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <BiSolidRightArrow />
+                    </motion.div>
                   </button>
                   <AnimatePresence>
                     {activeSubMenu === "events" && (
@@ -381,10 +423,17 @@ const MyNavbar = () => {
                 </li>
                 <li>
                   <button
-                    className="w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:outline-none"
+                    className="w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:outline-none flex justify-between items-center"
                     onClick={() => toggleSubMenu("gallery")}
                   >
-                    Галерия {activeSubMenu === "gallery" ? "▼" : "▶"}
+                    Галерия
+                    <motion.div
+                      initial={{ rotate: 0 }}
+                      animate={{ rotate: activeSubMenu === "gallery" ? 90 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <BiSolidRightArrow />
+                    </motion.div>
                   </button>
                   <AnimatePresence>
                     {activeSubMenu === "gallery" && (
@@ -411,11 +460,17 @@ const MyNavbar = () => {
                 </li>
                 <li>
                   <button
-                    className="w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:outline-none"
+                    className="w-full text-left px-4 py-2 text-white hover:text-orange-400 transition duration-300 focus:outline-none flex justify-between items-center"
                     onClick={() => toggleSubMenu("about")}
                   >
-                    За нас{" "}
-                    {activeSubMenu === "about" ? "▼" : <BiSolidRightArrow />}
+                    За нас
+                    <motion.div
+                      initial={{ rotate: 0 }}
+                      animate={{ rotate: activeSubMenu === "about" ? 90 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <BiSolidRightArrow />
+                    </motion.div>
                   </button>
                   <AnimatePresence>
                     {activeSubMenu === "about" && (

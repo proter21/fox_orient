@@ -12,7 +12,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
-import { db, auth } from "@/app/firebase/firebase";
+import { db, auth } from "@/firebase/firebase";
 import type { Competition, User } from "@/interfaces";
 
 async function fetchCompetitions(): Promise<Competition[]> {
@@ -26,6 +26,7 @@ export default function CompetitionsPage() {
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [adminLoading, setAdminLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -38,6 +39,7 @@ export default function CompetitionsPage() {
           setIsAdmin(userData.role === "admin");
         }
       }
+      setAdminLoading(false);
     };
 
     fetchUserData();
@@ -55,7 +57,7 @@ export default function CompetitionsPage() {
       });
   }, []);
 
-  if (loading) {
+  if (loading || adminLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         Зареждане...
@@ -64,7 +66,7 @@ export default function CompetitionsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 mt-16">
+    <div className="container mx-auto px-4 py-12 mt-16 min-h-screen">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold text-orange-500">Състезания</h1>
         {isAdmin && (
@@ -101,7 +103,12 @@ export default function CompetitionsPage() {
                   <p>Първи старт: {competition.time}</p>
                   <p>Местоположение: {competition.location}</p>
                   <p>Такса за участие: €{competition.entryFee}</p>
-                  <p>Възрастови групи: {competition.ageGroups.join(", ")}</p>
+                  <p>
+                    Възрастови групи:{" "}
+                    {competition.ageGroups
+                      ? competition.ageGroups.join(", ")
+                      : "N/A"}
+                  </p>
                 </div>
               </CardContent>
               <CardFooter className="flex justify-end space-x-2">

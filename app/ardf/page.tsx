@@ -1,10 +1,9 @@
 import type React from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 const ArdfPage: React.FC = () => {
   return (
-    <div className="bg-gray-100 py-12">
+    <div className="bg-gray-100 py-12 mt-16">
       <div className="container mx-auto px-4">
         <h1 className="text-4xl font-bold text-center mb-12 text-orange-500">
           Какво е ARDF?
@@ -30,12 +29,15 @@ const ArdfPage: React.FC = () => {
             </Link>
           </div>
           <div className="relative h-64 md:h-auto rounded-lg overflow-hidden">
-            <Image
-              src="/images/ardf-action.jpg"
-              alt="ARDF в действие"
-              fill
-              className="object-cover"
-            />
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/-47IqZ7p8I0?start=172"
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
           </div>
         </div>
 
@@ -119,14 +121,44 @@ const ArdfPage: React.FC = () => {
                   <td className="p-3">4</td>
                 </tr>
                 <tr className="border-b">
+                  <td className="p-3">М50</td>
+                  <td className="p-3">50 г. и по-възрастни</td>
+                  <td className="p-3">4</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="p-3">М60</td>
+                  <td className="p-3">60 г. и по-възрастни</td>
+                  <td className="p-3">3</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="p-3">М70</td>
+                  <td className="p-3">70 г. и по-възрастни</td>
+                  <td className="p-3">3</td>
+                </tr>
+                <tr className="border-b">
                   <td className="p-3">Ж19</td>
                   <td className="p-3">19 г. и по-млади</td>
                   <td className="p-3">4</td>
                 </tr>
-                <tr>
+                <tr className="border-b">
                   <td className="p-3">Ж21</td>
                   <td className="p-3">Всяка възраст</td>
                   <td className="p-3">4</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="p-3">Ж35</td>
+                  <td className="p-3">35 г.</td>
+                  <td className="p-3">4</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="p-3">Ж50</td>
+                  <td className="p-3">50 г. и по-възрастни</td>
+                  <td className="p-3">3</td>
+                </tr>
+                <tr>
+                  <td className="p-3">Ж60</td>
+                  <td className="p-3">60 г. и по-възрастни</td>
+                  <td className="p-3">3</td>
                 </tr>
               </tbody>
             </table>

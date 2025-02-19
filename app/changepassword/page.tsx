@@ -2,15 +2,11 @@
 
 import React, { useState, FormEvent } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
-import { useRouter } from "next/navigation";
-import MyFooter from "@/components/MyFooter";
-import MyNavbar from "@/components/MyNavbar";
-import { auth } from "../firebase/firebase";
+import { auth } from "../../firebase/firebase";
 
 const ChangePasswordPage: React.FC = () => {
   const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const router = useRouter();
   const email = auth.currentUser?.email || "";
 
   const handlePasswordReset = async (e: FormEvent) => {
@@ -26,7 +22,7 @@ const ChangePasswordPage: React.FC = () => {
     try {
       await sendPasswordResetEmail(auth, email);
       setSuccess("Линк за смяна на паролата е изпратен на вашия имейл.");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError("Грешка при изпращането на линка. Моля, опитайте отново.");
       console.error(err);
     }
@@ -34,7 +30,6 @@ const ChangePasswordPage: React.FC = () => {
 
   return (
     <>
-      <MyNavbar />
       <div className="min-h-screen bg-slate-50 text-gray-800 py-32">
         <div className="container mx-auto flex flex-col items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
@@ -61,7 +56,6 @@ const ChangePasswordPage: React.FC = () => {
           </div>
         </div>
       </div>
-      <MyFooter />
     </>
   );
 };

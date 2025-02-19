@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { doc, getDoc, deleteDoc } from "firebase/firestore";
-import { db, auth } from "@/app/firebase/firebase";
+
 import type { Competition, User } from "@/interfaces";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { auth, db } from "@/firebase/firebase";
 
 export default function CompetitionPage() {
   const router = useRouter();
@@ -20,7 +21,9 @@ export default function CompetitionPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const competitionId = Array.isArray(params.id) ? params.id[0] : params.id;
+      const competitionId = Array.isArray(params?.id)
+        ? params?.id[0]
+        : params?.id;
       if (!competitionId) {
         setLoading(false);
         return;
@@ -53,12 +56,15 @@ export default function CompetitionPage() {
     };
 
     fetchData();
-  }, [params.id]);
+  }, [params?.id]);
 
   const handleDelete = async () => {
-    if (competition) {
+    const competitionId = Array.isArray(params?.id)
+      ? params?.id[0]
+      : params?.id;
+    if (competition && competitionId) {
       try {
-        await deleteDoc(doc(db, "competitions", competition.id));
+        await deleteDoc(doc(db, "competitions", competitionId));
         toast({
           title: "Админ",
           description: "Състезанието беше изтрито успешно.",
@@ -108,6 +114,9 @@ export default function CompetitionPage() {
         </p>
         <p className="mb-4">
           <strong>Възрастови групи:</strong> {competition.ageGroups.join(", ")}
+        </p>
+        <p className="mb-4">
+          <strong>Описание:</strong> {competition.description}
         </p>
 
         {user ? (

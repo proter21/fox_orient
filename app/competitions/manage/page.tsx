@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -8,9 +10,10 @@ import {
   doc,
   deleteDoc,
   addDoc,
+  getDoc,
 } from "firebase/firestore";
-import { db, auth } from "@/app/firebase/firebase";
-import { Competition, User } from "@/interfaces";
+
+import type { Competition, User } from "@/interfaces";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { auth, db } from "@/firebase/firebase";
 
 export default function ManageCompetitionsPage() {
   const [competitions, setCompetitions] = useState<Competition[]>([]);
@@ -94,6 +98,7 @@ export default function ManageCompetitionsPage() {
       ageGroups: (formData.get("ageGroups") as string)
         .split(",")
         .map((g) => g.trim()),
+      description: formData.get("description") as string,
       participants: [],
     };
 
@@ -167,6 +172,10 @@ export default function ManageCompetitionsPage() {
                 Възрастови групи (разделени със запетая)
               </Label>
               <Input id="ageGroups" name="ageGroups" required />
+            </div>
+            <div>
+              <Label htmlFor="description">Описание</Label>
+              <Input id="description" name="description" required />
             </div>
             <Button
               type="submit"

@@ -8,9 +8,7 @@ import {
   updateDoc,
   deleteDoc,
 } from "firebase/firestore";
-import { db } from "../firebase/firebase";
-import MyNavbar from "@/components/MyNavbar";
-import MyFooter from "@/components/MyFooter";
+import { db } from "../../firebase/firebase";
 import { User, Competition } from "@/interfaces";
 
 const AdminPanelPage: React.FC = () => {
@@ -58,7 +56,11 @@ const AdminPanelPage: React.FC = () => {
       await updateDoc(userDocRef, updatedData);
       alert("User updated successfully");
     } catch (err) {
-      console.error("Error updating user:", err.message);
+      if (err instanceof Error) {
+        console.error("Error updating user:", err.message);
+      } else {
+        console.error("Error updating user:", err);
+      }
     }
   };
 
@@ -84,7 +86,6 @@ const AdminPanelPage: React.FC = () => {
 
   return (
     <>
-      <MyNavbar />
       <div className="min-h-screen bg-gray-100 text-gray-800 py-16">
         <div className="container mx-auto flex flex-col items-center">
           <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl">
@@ -172,9 +173,8 @@ const AdminPanelPage: React.FC = () => {
           </div>
         </div>
       </div>
-      <MyFooter />
     </>
   );
 };
 
-export default AdminPanelPage;
+export default React.memo(AdminPanelPage);

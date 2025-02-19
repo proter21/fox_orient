@@ -7,7 +7,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { db } from "@/app/firebase/firebase";
+import { db, auth } from "@/firebase/firebase";
 import {
   collection,
   query,
@@ -15,9 +15,11 @@ import {
   orderBy,
   limit,
   getDocs,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import type { Competition } from "@/interfaces";
-
+import AutoplayCarousel from "@/components/AutoCarousel";
 const features = [
   {
     title: "Лесно управление на състезанията",
@@ -59,31 +61,20 @@ async function getUpcomingCompetitions(): Promise<Competition[]> {
 
 export default async function Home() {
   const upcomingCompetitions = await getUpcomingCompetitions();
+  const currentUser = auth.currentUser;
+  let registeredCompetitions = [];
+
+  if (currentUser) {
+    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+    if (userDoc.exists()) {
+      registeredCompetitions = userDoc.data().registeredCompetitions || [];
+    }
+  }
 
   return (
     <>
       <section className="relative bg-zinc-800 text-white h-screen flex items-center justify-center overflow-hidden">
-        <Carousel className="w-full h-full" opts={{ loop: true }}>
-          <CarouselContent>
-            {[
-              "/images/WorldChamp2022.jpg",
-              "https://i.ibb.co/NWhLhrb/World-Champ-Ceremony2022.jpg",
-              "/images/evr2022.jpg",
-            ].map((src, index) => (
-              <CarouselItem key={index}>
-                <Image
-                  src={src || "/placeholder.svg"}
-                  alt={`Снимка ${index + 1}`}
-                  fill
-                  style={{ objectFit: "cover" }}
-                  priority={index === 0}
-                />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
-        </Carousel>
+        <AutoplayCarousel></AutoplayCarousel>
 
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="text-center text-white px-4">
@@ -140,12 +131,18 @@ export default async function Home() {
                   Дата: {new Date(competition.date).toLocaleDateString()} |
                   Място: {competition.location}
                 </p>
-                <Link
-                  href={`/competitions/${competition.id}/register`}
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded transition-colors"
-                >
-                  Регистрация
-                </Link>
+                {registeredCompetitions.includes(competition.id) ? (
+                  <p className="text-green-600 font-bold">
+                    Вие сте регистрирани за това състезание.
+                  </p>
+                ) : (
+                  <Link
+                    href={`/competitions/${competition.id}/register`}
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded transition-colors"
+                  >
+                    Регистрация
+                  </Link>
+                )}
               </div>
             ))}
           </div>

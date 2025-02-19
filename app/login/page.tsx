@@ -3,10 +3,8 @@
 import React, { useState, useCallback } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import MyNavbar from "@/components/MyNavbar";
-import MyFooter from "@/components/MyFooter";
 import Link from "next/link";
-import { auth } from "../firebase/firebase";
+import { auth } from "../../firebase/firebase";
 import { FirebaseError } from "firebase/app";
 
 const LoginPage = () => {
@@ -35,7 +33,6 @@ const LoginPage = () => {
 
   return (
     <main>
-      <MyNavbar />
       <section className="login py-12 my-12">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
@@ -110,9 +107,8 @@ const LoginPage = () => {
           </div>
         </div>
       </section>
-      <MyFooter />
     </main>
   );
 };
 
-export default LoginPage;
+export default React.memo(LoginPage);

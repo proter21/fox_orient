@@ -2,19 +2,13 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import MyNavbar from "@/components/MyNavbar";
+import { Suspense } from "react";
 import MyFooter from "@/components/MyFooter";
+import MyNavbar from "@/components/MyNavbar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
-  weight: "100 900",
-  display: "swap",
-});
-
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
   weight: "100 900",
   display: "swap",
 });
@@ -32,13 +26,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="bg">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <MyNavbar />
-        <main className="min-h-screen">{children}</main>
-        <Toaster />
-        <MyFooter />
+      <body className={`${geistSans.variable} antialiased`}>
+        <Suspense fallback={<div>Loading...</div>}>
+          <main className="min-h-screen">
+            <MyNavbar />
+            {children}
+            <MyFooter />
+          </main>
+          <Toaster />
+        </Suspense>
       </body>
     </html>
   );

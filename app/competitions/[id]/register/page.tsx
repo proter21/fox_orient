@@ -1,9 +1,11 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
-import { db, auth } from "@/app/firebase/firebase";
+
 import type { Competition, User } from "@/interfaces";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +19,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { ageGroups } from "@/app/profile/page";
+import { auth, db } from "@/firebase/firebase";
 
 interface RegisterCompetitionPageProps {
   params: { id: string };
@@ -37,7 +40,11 @@ export default function RegisterCompetitionPage({
     const fetchData = async () => {
       const unwrappedParams = await params;
       const competitionDoc = await getDoc(
-        doc(db, "competitions", unwrappedParams.id)
+        doc(
+          db,
+          "competitions",
+          typeof unwrappedParams?.id === "string" ? unwrappedParams.id : ""
+        )
       );
       if (competitionDoc.exists()) {
         setCompetition({
@@ -60,6 +67,18 @@ export default function RegisterCompetitionPage({
           const userData = { id: userDoc.id, ...userDoc.data() } as User;
           setUser(userData);
           setSelectedAgeGroup(userData.ageGroup);
+          if (competitionDoc.exists()) {
+            const competitionData = competitionDoc.data() as Competition;
+            if (competitionData.participants?.includes(userData.id)) {
+              toast({
+                title: "Грешка",
+                description: "Вече сте регистрирани за това състезание.",
+                variant: "destructive",
+              });
+              router.push(`/competitions/${competitionData.id}`);
+              return;
+            }
+          }
         }
       } else {
         router.push("/login");
@@ -81,7 +100,7 @@ export default function RegisterCompetitionPage({
     const validAgeGroups = ageGroups[
       user.gender === "male" ? "male" : "female"
     ].filter((group) => {
-      const groupAge = parseInt(group.replace(/\D/g, ""), 10);
+      const groupAge = Number.parseInt(group.replace(/\D/g, ""), 10);
       if (age < 21) {
         return groupAge <= 21 && groupAge >= age;
       } else {

@@ -12,6 +12,7 @@ export interface User {
 export interface Competition {
   id: string;
   name: string;
+  description: string;
   date: string;
   time: string;
   location: string;

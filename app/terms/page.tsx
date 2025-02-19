@@ -1,10 +1,6 @@
-import MyNavbar from "@/components/MyNavbar";
-import MyFooter from "@/components/MyFooter";
-
 export default function TermsPage() {
   return (
     <main>
-      <MyNavbar />
       {/* Terms Section */}
       <section className="terms py-12">
         <div className="container mx-auto px-4">
@@ -76,7 +72,7 @@ export default function TermsPage() {
               свържете с нас на:
             </p>
             <p className="text-gray-700">
-              Имейл:{" "}
+              Им��йл:{" "}
               <a href="mailto:info@foxorient.com" className="text-orange-500">
                 info@foxorient.com
               </a>
@@ -90,7 +86,6 @@ export default function TermsPage() {
           </div>
         </div>
       </section>
-      <MyFooter />
     </main>
   );
 }

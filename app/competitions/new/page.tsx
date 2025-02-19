@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -18,19 +20,12 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import {
-  addDoc,
-  collection,
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  doc,
-  getDoc,
-} from "firebase/firestore";
-import { auth, db } from "@/app/firebase/firebase";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
+
 import { ageGroups } from "@/app/profile/page";
-import { User } from "@/interfaces";
+import type { User } from "@/interfaces";
+import { auth, db } from "@/firebase/firebase";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -43,7 +38,7 @@ const formSchema = z.object({
   }),
   entryFee: z.number().min(0),
   ageGroups: z.array(z.string()),
-  additionalInfo: z.string().optional(),
+  description: z.string().optional(),
   file: z.any().optional(),
 });
 
@@ -61,7 +56,7 @@ export default function NewCompetitionPage() {
       location: "",
       entryFee: 0,
       ageGroups: [],
-      additionalInfo: "",
+      description: "",
       file: null,
     },
   });
@@ -100,7 +95,7 @@ export default function NewCompetitionPage() {
         location: values.location,
         entryFee: values.entryFee,
         ageGroups: values.ageGroups,
-        additionalInfo: values.additionalInfo,
+        description: values.description,
         fileURL: fileURL,
         createdAt: new Date().toISOString(),
       });
@@ -140,7 +135,7 @@ export default function NewCompetitionPage() {
                     <FormItem>
                       <FormLabel>Име на състезанието</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -155,7 +150,11 @@ export default function NewCompetitionPage() {
                       <FormItem>
                         <FormLabel>Дата</FormLabel>
                         <FormControl>
-                          <Input type="date" {...field} />
+                          <Input
+                            type="date"
+                            {...field}
+                            value={field.value ?? ""}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -169,7 +168,11 @@ export default function NewCompetitionPage() {
                       <FormItem>
                         <FormLabel>Първи старт</FormLabel>
                         <FormControl>
-                          <Input type="time" {...field} />
+                          <Input
+                            type="time"
+                            {...field}
+                            value={field.value ?? ""}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -184,7 +187,7 @@ export default function NewCompetitionPage() {
                     <FormItem>
                       <FormLabel>Местоположение</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} value={field.value || ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -202,6 +205,7 @@ export default function NewCompetitionPage() {
                           type="number"
                           min="0"
                           {...field}
+                          value={field.value ?? ""}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             field.onChange(Number(e.target.value))
                           }
@@ -305,7 +309,7 @@ export default function NewCompetitionPage() {
 
                 <FormField
                   control={form.control}
-                  name="additionalInfo"
+                  name="description"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Допълнителна информация</FormLabel>
@@ -324,7 +328,12 @@ export default function NewCompetitionPage() {
                     <FormItem>
                       <FormLabel>Прикачи файл (PDF)</FormLabel>
                       <FormControl>
-                        <Input type="file" accept=".pdf" {...field} />
+                        <Input
+                          type="file"
+                          accept=".pdf"
+                          {...field}
+                          value={field.value ?? ""}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

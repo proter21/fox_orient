@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
-import { db } from "@/app/firebase/firebase";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -12,16 +12,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { db } from "@/firebase/firebase";
 
 interface GalleryItem {
   id: string;
-  competitionId: string;
-  competitionName: string;
   imageUrl: string;
   caption: string;
+  competitionId: string;
+  competitionName: string;
 }
 
-export default function GalleryPage() {
+const GalleryPage = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [competitions, setCompetitions] = useState<
     { id: string; name: string }[]
@@ -55,9 +56,15 @@ export default function GalleryPage() {
     fetchGalleryData();
   }, []);
 
-  const filteredItems = selectedCompetition
-    ? galleryItems.filter((item) => item.competitionId === selectedCompetition)
-    : galleryItems;
+  const filteredItems = useMemo(
+    () =>
+      selectedCompetition
+        ? galleryItems.filter(
+            (item) => item.competitionId === selectedCompetition
+          )
+        : galleryItems,
+    [selectedCompetition, galleryItems]
+  );
 
   if (loading) {
     return (
@@ -109,4 +116,6 @@ export default function GalleryPage() {
       </div>
     </div>
   );
-}
+};
+
+export default React.memo(GalleryPage);

@@ -1,18 +1,15 @@
 "use client";
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useToast } from "@/hooks/use-toast"; // Correct import path
-
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import Link from "next/link";
-import { auth, db } from "../firebase/firebase";
+import { auth, db } from "../../firebase/firebase";
 import { FaMale, FaFemale } from "react-icons/fa";
 
-export default function RegisterPage() {
+const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const toast = useToast(); // Initialize useToast
 
   const handleRegister = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -46,14 +43,7 @@ export default function RegisterPage() {
       }
 
       if (age < 12) {
-        toast({
-          title: "Грешка",
-          description:
-            "Трябва да сте поне на 12 години, за да се регистрирате.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
+        alert("Трябва да сте поне на 12 години, за да се регистрирате.");
         setLoading(false);
         return;
       }
@@ -78,27 +68,15 @@ export default function RegisterPage() {
         router.push("/login");
       } catch (err: unknown) {
         if (err instanceof Error) {
-          toast({
-            title: "Грешка",
-            description: err.message,
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-          });
+          alert("Грешка: " + err.message);
         } else {
-          toast({
-            title: "Грешка",
-            description: "An unknown error occurred",
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-          });
+          alert("An unknown error occurred");
         }
       } finally {
         setLoading(false);
       }
     },
-    [router, toast]
+    [router]
   );
 
   return (
@@ -248,4 +226,6 @@ export default function RegisterPage() {
       </section>
     </main>
   );
-}
+};
+
+export default React.memo(RegisterPage);

@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/app/firebase/firebase";
+
 import type { Competition, User } from "@/interfaces";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { db } from "@/firebase/firebase";
 
 export default function ParticipantsPage() {
   const [participants, setParticipants] = useState<User[]>([]);
@@ -16,7 +17,9 @@ export default function ParticipantsPage() {
 
   useEffect(() => {
     const fetchParticipants = async () => {
-      const competitionId = Array.isArray(params.id) ? params.id[0] : params.id;
+      const competitionId = Array.isArray(params?.id)
+        ? params?.id[0]
+        : params?.id;
       if (!competitionId) {
         setLoading(false);
         return;
@@ -46,7 +49,7 @@ export default function ParticipantsPage() {
     };
 
     fetchParticipants();
-  }, [params.id]);
+  }, [params?.id]);
 
   if (loading) {
     return (
@@ -57,7 +60,7 @@ export default function ParticipantsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-24">
+    <div className="container mx-auto px-4 py-24 min-h-screen">
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-orange-500">

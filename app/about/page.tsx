@@ -27,7 +27,7 @@ const AboutUsPage = () => {
             </div>
             <div className="relative h-64 md:h-auto rounded-lg overflow-hidden">
               <Image
-                src="/images/team-photo.jpg"
+                src="/images/WorldChamp2022.jpg"
                 alt="Нашият екип"
                 fill
                 className="object-cover"
