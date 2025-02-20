@@ -22,10 +22,13 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
-
-import { ageGroups } from "@/app/profile/page";
 import type { User } from "@/interfaces";
 import { auth, db } from "@/firebase/firebase";
+
+const ageGroups = {
+  male: ["м14", "м16", "м19", "м21", "м40", "м50", "м60", "м70"],
+  female: ["ж14", "ж16", "ж19", "ж21", "ж35", "ж50"],
+};
 
 const formSchema = z.object({
   name: z.string().min(2, {
