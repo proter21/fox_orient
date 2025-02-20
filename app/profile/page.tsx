@@ -245,7 +245,7 @@ const ProfilePage: React.FC = () => {
                   {showPastCompetitions && (
                     <div className="mt-2 animate-fade-in">
                       {pastCompetitions.length === 0 ? (
-                        <p>Няма минали съ��тезания.</p>
+                        <p>Няма минали състезания.</p>
                       ) : (
                         <ul className="list-disc list-inside">
                           {pastCompetitions.map((comp) => (

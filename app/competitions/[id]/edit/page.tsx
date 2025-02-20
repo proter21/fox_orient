@@ -14,11 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { auth, db } from "@/firebase/firebase";
 
-export default function EditCompetitionPage({
-  params: initialParams,
-}: {
-  params: { id: string };
-}) {
+export default function EditCompetitionPage() {
   const [competition, setCompetition] = useState<Competition | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);

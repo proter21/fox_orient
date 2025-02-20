@@ -7,12 +7,10 @@ import { useToast } from "@/hooks/use-toast";
 import { auth } from "@/firebase/firebase";
 
 interface SignUpButtonProps {
-  competitionId: string;
   buttonText?: string;
 }
 
 export default function SignUpButton({
-  competitionId,
   buttonText = "Sign Up",
 }: SignUpButtonProps) {
   const [isLoading, setIsLoading] = useState(false);

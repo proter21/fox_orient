@@ -21,13 +21,7 @@ import {
 import { ageGroups } from "@/app/profile/page";
 import { auth, db } from "@/firebase/firebase";
 
-interface RegisterCompetitionPageProps {
-  params: { id: string };
-}
-
-export default function RegisterCompetitionPage({
-  params: initialParams,
-}: RegisterCompetitionPageProps) {
+export default function RegisterCompetitionPage() {
   const [competition, setCompetition] = useState<Competition | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
