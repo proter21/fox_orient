@@ -16,7 +16,7 @@ import { auth, db } from "../../firebase/firebase";
 import { User, Competition } from "@/interfaces";
 import { useToast } from "@/hooks/use-toast";
 
-export const ageGroups = {
+const ageGroups = {
   male: ["м14", "м16", "м19", "м21", "м40", "м50", "м60", "м70"],
   female: ["ж14", "ж16", "ж19", "ж21", "ж35", "ж50"],
 };

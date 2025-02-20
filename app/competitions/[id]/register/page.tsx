@@ -18,8 +18,12 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { ageGroups } from "@/app/profile/page";
 import { auth, db } from "@/firebase/firebase";
+
+const ageGroups = {
+  male: ["м14", "м16", "м19", "м21", "м40", "м50", "м60", "м70"],
+  female: ["ж14", "ж16", "ж19", "ж21", "ж35", "ж50"],
+};
 
 export default function RegisterCompetitionPage() {
   const [competition, setCompetition] = useState<Competition | null>(null);
