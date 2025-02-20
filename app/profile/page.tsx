@@ -97,7 +97,7 @@ const ProfilePage: React.FC = () => {
   };
 
   const handleAdminPanelRedirect = () => {
-    router.push("/adminpanel");
+    router.push("/admin");
   };
 
   const handleAgeGroupChange = async (

@@ -33,7 +33,7 @@ const LoginPage = () => {
 
   return (
     <main>
-      <section className="login py-12 my-12">
+      <section className="login py-12 my-12 min-h-screen">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
             Вход

@@ -1,3 +1,5 @@
+"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { db, auth } from "@/firebase/firebase";
 import {
@@ -12,6 +14,7 @@ import {
 } from "firebase/firestore";
 import type { Competition } from "@/interfaces";
 import AutoplayCarousel from "@/components/AutoCarousel";
+
 const features = [
   {
     title: "Лесно управление на състезанията",
@@ -51,16 +54,42 @@ async function getUpcomingCompetitions(): Promise<Competition[]> {
   );
 }
 
-export default async function Home() {
-  const upcomingCompetitions = await getUpcomingCompetitions();
-  const currentUser = auth.currentUser;
-  let registeredCompetitions = [];
+export default function Home() {
+  const [upcomingCompetitions, setUpcomingCompetitions] = useState<
+    Competition[]
+  >([]);
+  const [registeredCompetitions, setRegisteredCompetitions] = useState<
+    string[]
+  >([]);
+  const [loading, setLoading] = useState(true);
 
-  if (currentUser) {
-    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-    if (userDoc.exists()) {
-      registeredCompetitions = userDoc.data().registeredCompetitions || [];
-    }
+  useEffect(() => {
+    const fetchData = async () => {
+      const competitions = await getUpcomingCompetitions();
+      setUpcomingCompetitions(competitions);
+
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        if (userDoc.exists()) {
+          setRegisteredCompetitions(
+            userDoc.data().registeredCompetitions || []
+          );
+        }
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Зареждане...
+      </div>
+    );
   }
 
   return (
@@ -69,15 +98,18 @@ export default async function Home() {
         <AutoplayCarousel></AutoplayCarousel>
 
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="text-center text-white px-4">
-            <h1 className="text-4xl font-bold mb-4">Добре дошли в FoxOrient</h1>
-            <p className="text-lg mb-6">
+          <div className="text-center text-white px-4 space-y-6">
+            <h1 className="text-4xl font-bold opacity-0 translate-y-4 animate-[fadeIn_1s_ease-out_forwards]">
+              Добре дошли в FoxOrient
+            </h1>
+            <p className="text-lg opacity-0 translate-y-4 animate-[fadeIn_1s_ease-out_0.5s_forwards]">
               Интернет приложение за улеснена организация на състезания по
               спортно радиоориентиране.
             </p>
             <Link
               href="/register"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded text-lg transition-colors"
+              className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded text-lg 
+                       opacity-0 scale-95 animate-[fadeScale_0.5s_ease-out_1s_forwards] transition-colors"
             >
               Започнете сега
             </Link>
@@ -90,14 +122,17 @@ export default async function Home() {
         className="bg-gray-100 py-12 text-center text-gray-800"
       >
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-6">
+          <h2 className="text-3xl font-bold mb-6 opacity-0 animate-[fadeIn_1s_ease-out_forwards] [animation-play-state:paused] sticky:animation-play-state:running">
             Основни функции на приложението
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-white p-6 shadow rounded transition-transform hover:scale-105"
+                className="bg-white p-6 shadow rounded opacity-0 translate-y-4 hover:shadow-lg"
+                style={{
+                  animation: `fadeIn 0.6s ease-out ${index * 0.2}s forwards`,
+                }}
               >
                 <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                 <p>{feature.description}</p>
@@ -109,28 +144,33 @@ export default async function Home() {
 
       <section id="events" className="bg-white py-12 text-center text-gray-800">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-6">Предстоящи събития</h2>
+          <h2 className="text-3xl font-bold mb-6 opacity-0 animate-[fadeIn_1s_ease-out_forwards] [animation-play-state:paused] sticky:animation-play-state:running">
+            Предстоящи събития
+          </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {upcomingCompetitions.map((competition) => (
+            {upcomingCompetitions.map((competition, index) => (
               <div
                 key={competition.id}
-                className="bg-gray-100 p-6 shadow rounded transition-transform hover:scale-105"
+                className="bg-gray-100 p-6 shadow rounded opacity-0 translate-y-4 hover:shadow-lg"
+                style={{
+                  animation: `fadeIn 0.6s ease-out ${index * 0.2}s forwards`,
+                }}
               >
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-xl font-semibold mb-2 transition-colors duration-300 hover:text-orange-500">
                   {competition.name}
                 </h3>
-                <p className="mb-4">
+                <p className="mb-4 transition-all duration-300 hover:text-gray-600">
                   Дата: {new Date(competition.date).toLocaleDateString()} |
                   Място: {competition.location}
                 </p>
                 {registeredCompetitions.includes(competition.id) ? (
-                  <p className="text-green-600 font-bold">
+                  <p className="text-green-600 font-bold transition-all duration-300 hover:scale-105">
                     Вие сте регистрирани за това състезание.
                   </p>
                 ) : (
                   <Link
                     href={`/competitions/${competition.id}/register`}
-                    className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded transition-colors"
+                    className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded transition-all duration-300 transform hover:scale-110"
                   >
                     Регистрация
                   </Link>
@@ -140,6 +180,29 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes fadeScale {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </>
   );
 }
