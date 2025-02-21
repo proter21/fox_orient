@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   collection,
   getDocs,
@@ -8,9 +9,11 @@ import {
   updateDoc,
   deleteDoc,
   addDoc,
+  getDoc,
 } from "firebase/firestore";
 import { User, Competition } from "@/interfaces";
-import { db } from "@/firebase/firebase";
+import { db, auth } from "@/firebase/firebase";
+import { useToast } from "@/hooks/use-toast";
 
 const ageGroups = {
   male: ["м14", "м16", "м19", "м21", "м40", "м50", "м60", "м70"],
@@ -18,11 +21,47 @@ const ageGroups = {
 };
 
 const AdminPanelPage: React.FC = () => {
+  const router = useRouter();
+  const { toast } = useToast();
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [newUser, setNewUser] = useState<Partial<User>>({});
   const [editingUser, setEditingUser] = useState<Partial<User> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        if (userDoc.exists()) {
+          const userData = { id: userDoc.id, ...userDoc.data() } as User;
+          setUser(userData);
+          if (!userData.role || userData.role !== "admin") {
+            toast({
+              title: "Нямате достъп до тази страница",
+              description:
+                "Трябва да сте администратор, за да достъпите тази страница.",
+              variant: "destructive",
+            });
+            router.push("/");
+            return;
+          }
+        }
+      } else {
+        toast({
+          title: "Нямате достъп до тази страница",
+          description:
+            "Трябва да сте влезли в профила си, за да достъпите тази страница.",
+          variant: "destructive",
+        });
+        router.push("/login");
+      }
+    };
+
+    fetchData();
+  }, [router, toast]);
 
   const fetchAllUsers = async () => {
     try {
@@ -65,14 +104,27 @@ const AdminPanelPage: React.FC = () => {
     );
   }
 
+  if (!user || user.role !== "admin") {
+    return null; // Render nothing if not authenticated or not an admin
+  }
+
   const handleCreateUser = async () => {
     try {
       await addDoc(collection(db, "users"), newUser);
       setNewUser({});
-      alert("User created successfully");
+      toast({
+        title: "Админ",
+        description: "Потребителят е създаден успешно.",
+        variant: "default",
+      });
       fetchAllUsers();
     } catch (err) {
       console.error("Error creating user:", err);
+      toast({
+        title: "Грешка",
+        description: "Възникна грешка при създаването на потребителя.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -83,7 +135,11 @@ const AdminPanelPage: React.FC = () => {
     try {
       const userDocRef = doc(db, "users", userId);
       await updateDoc(userDocRef, updatedData);
-      alert("User updated successfully");
+      toast({
+        title: "Админ",
+        description: "Потребителят е актуализиран успешно.",
+        variant: "default",
+      });
       setEditingUser(null);
       fetchAllUsers();
     } catch (err) {
@@ -92,6 +148,11 @@ const AdminPanelPage: React.FC = () => {
       } else {
         console.error("Error updating user:", err);
       }
+      toast({
+        title: "Грешка",
+        description: "Възникна грешка при актуализирането на потребителя.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -100,9 +161,18 @@ const AdminPanelPage: React.FC = () => {
       const userDocRef = doc(db, "users", userId);
       await deleteDoc(userDocRef);
       setAllUsers(allUsers.filter((user) => user.id !== userId));
-      alert("User deleted successfully");
+      toast({
+        title: "Админ",
+        description: "Потребителят е изтрит успешно.",
+        variant: "default",
+      });
     } catch (err) {
       console.error("Error deleting user:", err);
+      toast({
+        title: "Грешка",
+        description: "Възникна грешка при изтриването на потребителя.",
+        variant: "destructive",
+      });
     }
   };
 

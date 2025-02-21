@@ -166,12 +166,9 @@ export default function CompetitionPage() {
         )}
 
         <div className="mt-4 flex justify-center">
-          <Button
-            onClick={() => router.back()}
-            className="bg-gray-500 hover:bg-gray-600"
-          >
-            Назад
-          </Button>
+          <Link href="/competitions">
+            <Button className="bg-gray-500 hover:bg-gray-600">Назад</Button>
+          </Link>
         </div>
       </div>
     </div>

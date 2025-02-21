@@ -96,11 +96,11 @@ export default function Home() {
               спортно радиоориентиране.
             </p>
             <Link
-              href="/register"
+              href="/competitions"
               className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded text-lg 
                        opacity-0 scale-95 animate-[fadeScale_0.5s_ease-out_1s_forwards] transition-colors"
             >
-              Започнете сега
+              Запишете се сега
             </Link>
           </div>
         </div>

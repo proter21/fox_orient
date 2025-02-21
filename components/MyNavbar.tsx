@@ -200,7 +200,7 @@ const MyNavbar = () => {
                   href="/about"
                   className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
                 >
-                  Кои сме ние
+                  Кои сме ние?
                 </Link>
               </MenubarItem>
               <MenubarItem asChild>
@@ -488,7 +488,7 @@ const MyNavbar = () => {
                             className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
                             onClick={toggleMenu}
                           >
-                            Кои сме ние
+                            Кои сме ние?
                           </Link>
                         </li>
                         <li>
