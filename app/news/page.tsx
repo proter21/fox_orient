@@ -36,23 +36,13 @@ const newsItems: NewsItem[] = [
   },
   {
     id: 3,
-    title: "Нови правила за младежката категория",
-    date: "2025-04-03",
+    title: "LZ1KAM лагер в Хисаря",
+    date: "2025-03-31",
     excerpt:
-      "Международната федерация обяви промени в регламента за състезатели под 18 години.",
-    imageUrl: "/placeholder.svg?height=200&width=300",
-    category: "Регламенти",
+      "Радиолюбителски клуб Хасково орагнизира лагер в Хисаря. Занятията ще бъдат на тема Ардуино, обучение за радиолюбителски инициал клас 1 и клас 2, както и тестване на новите приемници.",
+    imageUrl: "https://i.ibb.co/p6ZKbYWp/image.png",
+    category: "Лагери",
   },
-  {
-    id: 4,
-    title: "Успех на българския отбор на Европейското първенство",
-    date: "2025-03-20",
-    excerpt:
-      "Нашите състезатели се завърнаха с 3 медала от първенството в Германия.",
-    imageUrl: "/placeholder.svg?height=200&width=300",
-    category: "Постижения",
-  },
-  // Добавете още новини тук
 ];
 
 const categories = [...new Set(newsItems.map((item) => item.category))];
@@ -146,6 +136,9 @@ export default function NewsPage() {
                   onClick={() => {
                     if (item.id === 1) {
                       window.location.href = "https://ardf2025.lt/bulletin/";
+                    } else if (item.id === 2) {
+                      window.location.href =
+                        "https://www.ham-yota.com/category/regional-activities/yota-france-2025/";
                     }
                   }}
                 >
