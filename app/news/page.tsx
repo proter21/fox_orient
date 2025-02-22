@@ -17,15 +17,25 @@ interface NewsItem {
 const newsItems: NewsItem[] = [
   {
     id: 1,
-    title: "Национално първенство по радиозасичане 2025",
-    date: "2025-05-15",
+    title: "Световно първенство по радиозасичане 2025",
+    date: "2025-08-16",
     excerpt:
-      "Очаквайте вълнуващо състезание в планината Родопи. Регистрацията е отворена!",
-    imageUrl: "/placeholder.svg?height=200&width=300",
+      "Очаквайте 22-ро вълнуващо IARU световно първенство в Бирштонас, Литва.",
+    imageUrl:
+      "https://ardf2025.lt/wp-content/uploads/2024/12/22nd-IARU-World-ARDF-Championships-No.1.png",
     category: "Състезания",
   },
   {
     id: 2,
+    title: "YOTA летен лагер 2025. ",
+    date: "2025-08-18",
+    excerpt: "Тази година летният лагер YOTA ще се проведе във Франция.",
+    imageUrl:
+      "https://www.ham-yota.com/wp-content/uploads/2025/02/yota_summer_camp_25-resize.png",
+    category: "Лагери",
+  },
+  {
+    id: 3,
     title: "Нови правила за младежката категория",
     date: "2025-04-03",
     excerpt:
@@ -34,7 +44,7 @@ const newsItems: NewsItem[] = [
     category: "Регламенти",
   },
   {
-    id: 3,
+    id: 4,
     title: "Успех на българския отбор на Европейското първенство",
     date: "2025-03-20",
     excerpt:
@@ -133,6 +143,11 @@ export default function NewsPage() {
                   className="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-full transition duration-300"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    if (item.id === 1) {
+                      window.location.href = "https://ardf2025.lt/bulletin/";
+                    }
+                  }}
                 >
                   Прочети повече
                 </motion.button>
