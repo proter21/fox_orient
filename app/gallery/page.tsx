@@ -79,7 +79,7 @@ const GalleryPage = () => {
           Галерия
         </h1>
         <p className="text-center text-zinc-600 mb-12 max-w-2xl mx-auto">
-          Разгледайте снимки от нашите събития и състезания по ориентиране
+          Разгледайте снимки от нашите събития и състезания по радиозасичане
         </p>
 
         <div className="flex justify-center mb-12">
