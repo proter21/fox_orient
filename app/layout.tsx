@@ -16,7 +16,7 @@ const geistSans = localFont({
 export const metadata: Metadata = {
   title: "FoxOrient",
   description:
-    "Интернет приложение за организация на състезания по спортно радиоориентиране",
+    "Интернет приложение за организация на състезания по спортно радиозасичане",
 };
 
 export default function RootLayout({

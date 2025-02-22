@@ -93,7 +93,7 @@ export default function Home() {
             </h1>
             <p className="text-lg opacity-0 translate-y-4 animate-[fadeIn_1s_ease-out_0.5s_forwards]">
               Интернет приложение за улеснена организация на състезания по
-              спортно радиоориентиране.
+              спортно радиозасичане.
             </p>
             <Link
               href="/competitions"
