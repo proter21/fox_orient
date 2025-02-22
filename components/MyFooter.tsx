@@ -15,8 +15,8 @@ const MyFooter = () => {
         <Link href="#" className="text-orange-500 hover:text-orange-400">
           Instagram
         </Link>
-        <Link href="#" className="text-orange-500 hover:text-orange-400">
-          Twitter
+        <Link href="/terms" className="text-orange-500 hover:text-orange-400">
+          Условия за ползване
         </Link>
       </div>
     </footer>
