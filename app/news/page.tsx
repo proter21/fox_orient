@@ -40,7 +40,8 @@ const newsItems: NewsItem[] = [
     date: "2025-03-31",
     excerpt:
       "Радиолюбителски клуб Хасково орагнизира лагер в Хисаря. Занятията ще бъдат на тема Ардуино, обучение за радиолюбителски инициал клас 1 и клас 2, както и тестване на новите приемници.",
-    imageUrl: "https://i.ibb.co/p6ZKbYWp/image.png",
+    imageUrl:
+      "https://lh3.googleusercontent.com/pw/AP1GczOYEXYJy9QFcT2_uRD2qfmUgiz1UM2HWBEpB8wpqt9zP7iucR5IN_aDXloX6kDRU9mWnatQzz6JMQjWoewOirTCB-Jy6VpyMtpj0WSDq8iyaodSs-9g8LHYoH_lABsVxqZB0owwkdZr18Nb-KYGQNj4=w1857-h836-s-no-gm?authuser=0",
     category: "Лагери",
   },
 ];
@@ -139,6 +140,8 @@ export default function NewsPage() {
                     } else if (item.id === 2) {
                       window.location.href =
                         "https://www.ham-yota.com/category/regional-activities/yota-france-2025/";
+                    } else if (item.id === 3) {
+                      window.location.href = "http://ramhard.net/lz1kam/";
                     }
                   }}
                 >
