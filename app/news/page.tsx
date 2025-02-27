@@ -1,22 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Search, Calendar, Tag } from "lucide-react";
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import { db } from "@/firebase/firebase";
+import AdminNewsUpload from "@/components/AdminNewsUpload";
+import { useAuth } from "@/context/AuthContext";
 
 interface NewsItem {
-  id: number;
+  id: string;
   title: string;
   date: string;
   excerpt: string;
   imageUrl: string;
   category: string;
+  link?: string;
 }
 
-const newsItems: NewsItem[] = [
+const staticNewsItems: NewsItem[] = [
   {
-    id: 1,
+    id: "static-1",
     title: "Световно първенство по радиозасичане 2025",
     date: "2025-08-16",
     excerpt:
@@ -24,18 +29,20 @@ const newsItems: NewsItem[] = [
     imageUrl:
       "https://ardf2025.lt/wp-content/uploads/2024/12/22nd-IARU-World-ARDF-Championships-No.1.png",
     category: "Състезания",
+    link: "https://ardf2025.lt/bulletin/",
   },
   {
-    id: 2,
-    title: "YOTA летен лагер 2025. ",
+    id: "static-2",
+    title: "YOTA летен лагер 2025",
     date: "2025-08-18",
     excerpt: "Тази година летният лагер YOTA ще се проведе във Франция.",
     imageUrl:
       "https://www.ham-yota.com/wp-content/uploads/2025/02/yota_summer_camp_25-resize.png",
     category: "Лагери",
+    link: "https://www.ham-yota.com/category/regional-activities/yota-france-2025/",
   },
   {
-    id: 3,
+    id: "static-3",
     title: "LZ1KAM лагер в Хисаря",
     date: "2025-03-31",
     excerpt:
@@ -43,14 +50,44 @@ const newsItems: NewsItem[] = [
     imageUrl:
       "https://lh3.googleusercontent.com/pw/AP1GczOYEXYJy9QFcT2_uRD2qfmUgiz1UM2HWBEpB8wpqt9zP7iucR5IN_aDXloX6kDRU9mWnatQzz6JMQjWoewOirTCB-Jy6VpyMtpj0WSDq8iyaodSs-9g8LHYoH_lABsVxqZB0owwkdZr18Nb-KYGQNj4=w1857-h836-s-no-gm?authuser=0",
     category: "Лагери",
+    link: "http://ramhard.net/lz1kam/",
   },
 ];
 
-const categories = [...new Set(newsItems.map((item) => item.category))];
-
 export default function NewsPage() {
+  const { isAdmin } = useAuth();
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchNews = async () => {
+    try {
+      const newsRef = collection(db, "news");
+      const newsQuery = query(newsRef, orderBy("createdAt", "desc"));
+      const newsSnapshot = await getDocs(newsQuery);
+      const newsData = newsSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as NewsItem[];
+
+      // Комбиниране на статичните и динамичните новини
+      const allNews = [...staticNewsItems, ...newsData];
+      setNewsItems(allNews);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+      // Ако има грешка при зареждането от Firebase, показваме поне статичните новини
+      setNewsItems(staticNewsItems);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
+  const categories = [...new Set(newsItems.map((item) => item.category))];
 
   const filteredNews = newsItems.filter(
     (item) =>
@@ -135,13 +172,8 @@ export default function NewsPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => {
-                    if (item.id === 1) {
-                      window.location.href = "https://ardf2025.lt/bulletin/";
-                    } else if (item.id === 2) {
-                      window.location.href =
-                        "https://www.ham-yota.com/category/regional-activities/yota-france-2025/";
-                    } else if (item.id === 3) {
-                      window.location.href = "http://ramhard.net/lz1kam/";
+                    if (item.link) {
+                      window.location.href = item.link;
                     }
                   }}
                 >
@@ -152,6 +184,10 @@ export default function NewsPage() {
           ))}
         </div>
       </div>
+
+      {isAdmin && (
+        <AdminNewsUpload isAdmin={isAdmin} onNewsCreated={fetchNews} />
+      )}
     </div>
   );
 }

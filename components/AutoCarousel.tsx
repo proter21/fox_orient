@@ -26,23 +26,25 @@ export default function AutoplayCarousel() {
   return (
     <Carousel
       plugins={[plugin.current]}
-      className="w-full h-screen mx-auto"
+      className="w-full h-full relative"
       onMouseEnter={plugin.current.stop}
       onMouseLeave={plugin.current.reset}
     >
       <CarouselContent className="h-full">
         {images.map((src, index) => (
-          <CarouselItem key={index} className="h-full">
-            <div className="h-full">
-              <Card className="h-full">
-                <CardContent className="flex h-full items-center justify-center p-0">
+          <CarouselItem key={index} className="h-full relative">
+            <div className="w-full h-full">
+              <Card className="w-full h-full border-0">
+                <CardContent className="p-0 w-full h-[100vh] relative">
                   <Image
                     src={src}
                     alt={`Slide ${index + 1}`}
-                    style={{ objectFit: "cover" }}
-                    className="rounded-none"
-                    width={1500}
-                    height={500}
+                    fill
+                    priority
+                    style={{
+                      objectFit: "cover",
+                      objectPosition: "center",
+                    }}
                   />
                 </CardContent>
               </Card>
@@ -50,8 +52,8 @@ export default function AutoplayCarousel() {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
+      <CarouselPrevious className="hidden md:flex" />
+      <CarouselNext className="hidden md:flex" />
     </Carousel>
   );
 }

@@ -61,6 +61,7 @@ export default function Home() {
   const [registeredCompetitions, setRegisteredCompetitions] = useState<
     string[]
   >([]);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,11 +82,26 @@ export default function Home() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <>
-      <section className="relative bg-zinc-800 text-white h-screen flex items-center justify-center overflow-hidden">
-        <AutoplayCarousel></AutoplayCarousel>
-
+      <section className="relative w-full h-screen">
+        <AutoplayCarousel />
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="text-center text-white px-4 space-y-6">
             <h1 className="text-4xl font-bold opacity-0 translate-y-4 animate-[fadeIn_1s_ease-out_forwards]">
@@ -169,6 +185,33 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <button
+        onClick={scrollToTop}
+        className={`fixed bottom-8 right-8 bg-orange-500 hover:bg-orange-600 text-white w-12 h-12 rounded-full 
+                   flex items-center justify-center shadow-lg transition-all duration-300 z-50
+                   ${
+                     showScrollTop
+                       ? "opacity-100 translate-y-0"
+                       : "opacity-0 translate-y-16"
+                   }`}
+        aria-label="Scroll to top"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M5 15l7-7 7 7"
+          />
+        </svg>
+      </button>
 
       <style jsx global>{`
         @keyframes fadeIn {
