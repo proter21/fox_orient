@@ -59,7 +59,6 @@ export default function NewsPage() {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
   const fetchNews = async () => {
     try {
@@ -78,8 +77,6 @@ export default function NewsPage() {
       console.error("Error fetching news:", error);
       // Ако има грешка при зареждането от Firebase, показваме поне статичните новини
       setNewsItems(staticNewsItems);
-    } finally {
-      setLoading(false);
     }
   };
 
