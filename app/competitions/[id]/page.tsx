@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { doc, getDoc, deleteDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  deleteDoc,
+  updateDoc,
+  arrayRemove,
+} from "firebase/firestore";
 
 import type { Competition, User } from "@/interfaces";
 import { Button } from "@/components/ui/button";
@@ -81,6 +87,35 @@ export default function CompetitionPage() {
     }
   };
 
+  const handleUnsubscribe = async () => {
+    if (!competition || !user) return;
+
+    try {
+      await updateDoc(doc(db, "competitions", competition.id), {
+        participants: arrayRemove(user.id),
+      });
+      setIsRegistered(false);
+      toast({
+        title: "Успешно",
+        description: "Успешно се отписахте от състезанието.",
+      });
+    } catch {
+      toast({
+        title: "Грешка",
+        description: "Възникна проблем при отписването от състезанието.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const canModifyRegistration = () => {
+    if (!competition) return false;
+    const competitionDate = new Date(competition.date);
+    const twoDaysBeforeEvent = new Date(competitionDate);
+    twoDaysBeforeEvent.setDate(twoDaysBeforeEvent.getDate() - 2);
+    return new Date() <= twoDaysBeforeEvent;
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -121,11 +156,21 @@ export default function CompetitionPage() {
 
         {user ? (
           isRegistered ? (
-            <p className="text-green-600 font-bold">
-              Вие сте регистрирани за това състезание.
-            </p>
+            canModifyRegistration() ? (
+              <Button
+                onClick={handleUnsubscribe}
+                className="bg-red-500 hover:bg-red-600"
+              >
+                Отпиши се
+              </Button>
+            ) : (
+              <p className="text-yellow-600 font-bold">
+                Не можете да се отпишете по-малко от 2 дни преди състезанието.
+              </p>
+            )
           ) : (
-            !isPastEvent && (
+            !isPastEvent &&
+            canModifyRegistration() && (
               <Link href={`/competitions/${competition.id}/register`}>
                 <Button className="bg-orange-500 hover:bg-orange-600">
                   Регистрирай се
@@ -134,13 +179,19 @@ export default function CompetitionPage() {
             )
           )
         ) : (
-          !isPastEvent && (
+          !isPastEvent &&
+          canModifyRegistration() && (
             <Link href="/login">
               <Button className="bg-orange-500 hover:bg-orange-600">
                 Влезте, за да се регистрирате
               </Button>
             </Link>
           )
+        )}
+        {!canModifyRegistration() && !isRegistered && !isPastEvent && (
+          <p className="text-yellow-600 font-bold">
+            Регистрацията е затворена (по-малко от 2 дни до състезанието).
+          </p>
         )}
 
         {user?.role === "admin" && (
