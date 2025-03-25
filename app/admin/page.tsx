@@ -14,6 +14,15 @@ import {
 import { User, Competition } from "@/interfaces";
 import { db, auth } from "@/firebase/firebase";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const ageGroups = {
   male: ["м14", "м16", "м19", "м21", "м40", "м50", "м60", "м70"],
@@ -29,6 +38,7 @@ const AdminPanelPage: React.FC = () => {
   const [editingUser, setEditingUser] = useState<Partial<User> | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -192,76 +202,6 @@ const AdminPanelPage: React.FC = () => {
           <h1 className="text-4xl font-bold text-orange-600 mb-8 text-center">
             Административен Панел
           </h1>
-
-          {/* Create User Form */}
-          <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border-2 border-orange-100">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
-              <span className="w-2 h-8 bg-orange-500 rounded-full mr-3"></span>
-              Създаване на нов потребител
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <input
-                type="text"
-                placeholder="Име"
-                value={newUser.fullName || ""}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, fullName: e.target.value })
-                }
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={newUser.email || ""}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, email: e.target.value })
-                }
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-              />
-              <input
-                type="date"
-                placeholder="Дата на раждане"
-                value={newUser.birthDate || ""}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, birthDate: e.target.value })
-                }
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-              />
-              <select
-                value={newUser.gender || ""}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, gender: e.target.value })
-                }
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-              >
-                <option value="">Изберете пол</option>
-                <option value="male">Мъж</option>
-                <option value="female">Жена</option>
-              </select>
-              <select
-                value={newUser.ageGroup || ""}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, ageGroup: e.target.value })
-                }
-                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-              >
-                <option value="">Изберете възрастова група</option>
-                {ageGroups[newUser.gender === "male" ? "male" : "female"].map(
-                  (group) => (
-                    <option key={group} value={group}>
-                      {group.toUpperCase()}
-                    </option>
-                  )
-                )}
-              </select>
-              <button
-                onClick={handleCreateUser}
-                className="md:col-span-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-3 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg font-semibold"
-              >
-                Създай потребител
-              </button>
-            </div>
-          </div>
 
           {/* Users List */}
           <div className="grid gap-8">
@@ -440,6 +380,86 @@ const AdminPanelPage: React.FC = () => {
               </div>
             ))}
           </div>
+
+          {/* Create User Dialog */}
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg bg-orange-500 hover:bg-orange-600">
+                <Plus size={24} />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[525px]">
+              <DialogHeader>
+                <DialogTitle>Добавяне на нов потребител</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 mt-4">
+                <input
+                  type="text"
+                  placeholder="Име"
+                  value={newUser.fullName || ""}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, fullName: e.target.value })
+                  }
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={newUser.email || ""}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, email: e.target.value })
+                  }
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                />
+                <input
+                  type="date"
+                  placeholder="Дата на раждане"
+                  value={newUser.birthDate || ""}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, birthDate: e.target.value })
+                  }
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                />
+                <select
+                  value={newUser.gender || ""}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, gender: e.target.value })
+                  }
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                >
+                  <option value="">Изберете пол</option>
+                  <option value="male">Мъж</option>
+                  <option value="female">Жена</option>
+                </select>
+                <select
+                  value={newUser.ageGroup || ""}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, ageGroup: e.target.value })
+                  }
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                >
+                  <option value="">Изберете възрастова група</option>
+                  {newUser.gender &&
+                    ageGroups[
+                      newUser.gender === "male" ? "male" : "female"
+                    ].map((group) => (
+                      <option key={group} value={group}>
+                        {group.toUpperCase()}
+                      </option>
+                    ))}
+                </select>
+                <Button
+                  onClick={() => {
+                    handleCreateUser();
+                    setIsDialogOpen(false);
+                  }}
+                  className="w-full bg-orange-500 hover:bg-orange-600"
+                >
+                  Създай потребител
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>
