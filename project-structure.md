@@ -133,51 +133,294 @@ The project uses Firebase for backend services. The configuration file is locate
 
 ## Pages
 
-### Home Page
+### Home Page (`/app/page.tsx`)
 
-- The main landing page of the application. Displays a welcome message, features, and upcoming events. Located at `/app/page.tsx`.
+- Landing page featuring:
+  - Hero section with auto-playing carousel
+  - Latest news and announcements
+  - Upcoming competitions (next 2 competitions)
+  - Club features and benefits
+  - Quick access links to important sections
+  - Contact information
+  - Integration with Firebase for real-time data
 
-### Gallery Page
+### Gallery Page (`/app/gallery/page.tsx`)
 
-- A page that displays a gallery of images with filtering options based on competitions. Located at `/app/gallery/page.tsx`.
+- Photo gallery system featuring:
+  - Grid layout of competition photos
+  - Filtering by competition/event
+  - Lightbox view for full-size images
+  - Admin features:
+    - Upload new photos
+    - Delete photos
+    - Organize photos by competition
+  - Firebase Storage integration for image hosting
+  - Real-time updates using Firestore
 
-### Competition Details Page
+### Competition Pages
 
-- A page that displays details of a specific competition. Located at `/app/competitions/[id]/page.tsx`.
+#### `/app/competitions`
 
-### Competition Registration Page
+- `page.tsx`: Main competitions listing page
+  - Displays all competitions in a grid layout
+  - Shows competition details like name, date, location, and entry fee
+  - Admin users can see additional options to add new competitions
+  - Each competition card has links to view details and participants (for admins)
+  - Competitions are fetched from Firebase Firestore
 
-- A page that allows users to register for a specific competition. Located at `/app/competitions/[id]/register/page.tsx`.
+#### `/app/competitions/new`
 
-### Registration Page
+- `page.tsx`: Create new competition page (Admin only)
+  - Form for creating new competitions with fields:
+    - Name
+    - Date
+    - First Start Time
+    - Location
+    - Entry Fee
+    - Age Groups (configurable for male/female categories)
+    - Description
+    - File attachment (PDF)
+  - Age groups are predefined:
+    - Male: м14, м16, м19, м21, м40, м50, м60, м70
+    - Female: ж14, ж16, ж19, ж21, ж35, ж50
+  - Saves competition data to Firebase Firestore
 
-- A page that allows users to create a new account. Located at `/app/register/page.tsx`.
+#### `/app/competitions/[id]`
 
-### Login Page
+- `page.tsx`: Competition details page
+  - Displays complete competition information
+  - Registration button for logged-in users
+  - Shows registration status
+  - Registration closes 2 days before the competition
+  - Admin features:
+    - Edit competition
+    - View participants
+    - Delete competition
+  - Unsubscribe option for registered users (until 2 days before)
 
-- A page that allows users to log into their account. Located at `/app/login/page.tsx`.
+#### `/app/competitions/[id]/register`
 
-### Calendar Page
+- `page.tsx`: Competition registration page
+  - Shows registration form for logged-in users
+  - Pre-fills user information
+  - Age group selection based on:
+    - User's gender
+    - User's age
+    - Available competition age groups
+  - Validation rules:
+    - Checks if user's age matches selected group
+    - Verifies group is available in competition
+    - Prevents duplicate registrations
+  - Updates both competition and user documents in Firestore
 
-- A page that displays a calendar of events. Located at `/app/calendar/page.tsx`.
+#### `/app/competitions/[id]/participants`
 
-### News Page
+- `page.tsx`: Competition participants page (Admin view)
+  - Lists all registered participants
+  - Groups participants by age category
+  - Shows detailed participant information:
+    - Full name
+    - Email
+    - Birth date
+    - Age group
+  - Displays total participant count
+  - Sortable by age groups
 
-- A page that displays news articles and updates. Located at `/app/news/page.tsx`.
+#### `/app/competitions/[id]/edit`
 
-### Profile Page
+- `page.tsx`: Competition edit page (Admin only)
+  - Pre-filled form with current competition data
+  - Same fields as creation form
+  - Updates competition document in Firestore
+  - Validation for required fields
+  - Success/error notifications
 
-- A page that allows users to view and edit their profile information. Located at `/app/profile/page.tsx`.
+#### `/app/competitions/manage`
 
-## Interfaces
+- `page.tsx`: Competition management page (Admin only)
+  - Lists all competitions in table format
+  - Quick actions:
+    - Delete competitions
+    - View details
+    - Edit competitions
+  - Add new competition form
+  - Manages competition data in Firestore
 
-### Competition
+### Profile Page (`/app/profile/page.tsx`)
 
-- Defines the structure of a competition object. Located at `/interfaces/index.ts`.
+- User profile management:
+  - Personal information display and editing
+  - Competition history:
+    - Upcoming competitions (registered)
+    - Past competitions
+  - Age group management:
+    - Current age group
+    - Automatic age group suggestions
+  - Account settings:
+    - Email preferences
+    - Password change
+    - Profile picture
+  - Admin panel access (for admin users)
+  - Firebase Authentication integration
 
-### GalleryItem
+### Calendar Page (`/app/calendar/page.tsx`)
 
-- Defines the structure of a gallery item object. Located at `/app/gallery/page.tsx`.
+- Interactive calendar featuring:
+  - Monthly view of all events
+  - Competition dates highlighted
+  - Event details on click:
+    - Competition name
+    - Location
+    - Start time
+    - Registration status
+  - Filter options:
+    - By competition type
+    - By age group
+    - By location
+  - Integration with competition data from Firestore
+  - Export calendar functionality
+
+### News Page (`/app/news/page.tsx`)
+
+- Club news and updates:
+  - Latest announcements
+  - Competition results
+  - Training schedules
+  - Club achievements
+  - Admin features:
+    - Create new posts
+    - Edit existing posts
+    - Delete posts
+    - Pin important announcements
+  - Rich text editor for content
+  - Image embedding
+  - Firebase Firestore for content storage
+
+### Registration Page (`/app/register/page.tsx`)
+
+- New user registration:
+  - Form fields:
+    - Full name
+    - Email
+    - Password
+    - Birth date
+    - Gender
+  - Age group auto-assignment
+  - Email verification
+  - Terms and conditions acceptance
+  - Firebase Authentication integration
+  - Automatic profile creation in Firestore
+  - Welcome email sending
+
+### Login Page (`/app/login/page.tsx`)
+
+- User authentication:
+  - Email/password login
+  - Remember me option
+  - Password reset functionality
+  - Error handling:
+    - Invalid credentials
+    - Account not verified
+    - Account locked
+  - Redirect to previous page after login
+  - Session management
+  - Firebase Authentication integration
+
+### Admin Dashboard (`/app/admin/page.tsx`)
+
+- Administrative features:
+  - User management:
+    - View all users
+    - Edit user roles
+    - Manage age groups
+  - Competition management:
+    - Create/Edit/Delete competitions
+    - Manage registrations
+    - View statistics
+  - Gallery management:
+    - Upload/Delete photos
+    - Organize albums
+  - News management:
+    - Create/Edit/Delete posts
+  - System statistics:
+    - User counts
+    - Registration statistics
+    - Popular competitions
+  - Access control based on admin role
+
+### Data Structures
+
+### Competition Data Structure
+
+```typescript
+interface Competition {
+  id: string;
+  name: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  entryFee: number;
+  ageGroups: string[];
+  participants: string[];
+}
+```
+
+### Age Group Structure
+
+The system uses predefined age groups for both male and female categories:
+
+- Male groups: м14, м16, м19, м21, м40, м50, м60, м70
+- Female groups: ж14, ж16, ж19, ж21, ж35, ж50
+
+Age group assignment rules:
+
+- Groups are assigned based on participant's age and gender
+- Users under 21 can only register for groups up to their age
+- Users over 21 can register for groups matching or above their age
+
+### User Interface
+
+```typescript
+interface User {
+  id: string;
+  fullName: string;
+  email: string;
+  birthDate: string;
+  gender: string;
+  ageGroup: string;
+  role: string;
+  createdAt: string;
+}
+```
+
+### News Post Interface
+
+```typescript
+interface NewsPost {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  createdAt: string;
+  updatedAt: string;
+  isPinned: boolean;
+  imageUrls: string[];
+}
+```
+
+### Gallery Item Interface
+
+```typescript
+interface GalleryItem {
+  id: string;
+  imageUrl: string;
+  competitionId: string;
+  competitionName: string;
+  caption: string;
+  createdAt: string;
+}
+```
 
 ## Summary
 
