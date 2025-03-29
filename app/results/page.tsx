@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
-import { db } from "@/firebase/firebase";
+import { db, auth } from "@/firebase/firebase";
 import type { Competition, User } from "@/interfaces";
+import { Button } from "@/components/ui/button";
 
 interface ParticipantResult {
   place: number;
@@ -29,6 +30,20 @@ interface Result {
 const ResultsPage = () => {
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        if (userDoc.exists()) {
+          setIsAdmin(userDoc.data().role === "admin");
+        }
+      }
+    };
+    checkAdmin();
+  }, []);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -47,53 +62,67 @@ const ResultsPage = () => {
           if (competition.participants && competition.participants.length > 0) {
             const participantsData: { [key: string]: ParticipantResult[] } = {};
 
-            // Fetch all participants data
             const participants = await Promise.all(
               competition.participants.map(async (userId) => {
                 const userDoc = await getDoc(doc(db, "users", userId));
                 if (userDoc.exists()) {
                   const userData = userDoc.data() as User;
+                  const userResult = competition.results?.[userId];
                   return {
                     userId,
                     name: userData.fullName,
                     ageGroup: userData.ageGroup,
-                    time: "00:00:00", // Replace with actual time
+                    time: userResult?.time || "99:99:99",
                   };
                 }
                 return null;
               })
             );
 
-            // Group participants by age group
-            participants.forEach((participant) => {
-              if (participant && participant.ageGroup) {
-                if (!participantsData[participant.ageGroup]) {
-                  participantsData[participant.ageGroup] = [];
-                }
-                participantsData[participant.ageGroup].push({
-                  ...participant,
-                  place: participantsData[participant.ageGroup].length + 1,
-                });
+            const validParticipants = participants.filter(
+              (p): p is NonNullable<typeof p> => p !== null
+            );
+
+            validParticipants.forEach((participant) => {
+              if (!participantsData[participant.ageGroup]) {
+                participantsData[participant.ageGroup] = [];
               }
+              participantsData[participant.ageGroup].push({
+                ...participant,
+                place: 0, // Will be assigned after sorting
+              });
             });
 
-            // Take top 3 for each age group
             Object.keys(participantsData).forEach((ageGroup) => {
+              participantsData[ageGroup].sort((a, b) =>
+                a.time.localeCompare(b.time)
+              );
               participantsData[ageGroup] = participantsData[ageGroup]
-                .slice(0, 3)
-                .sort((a, b) => a.time.localeCompare(b.time));
+                .map((p, index) => ({
+                  ...p,
+                  place: index + 1,
+                }))
+                .filter((p) => p.time !== "99:99:99")
+                .slice(0, 3);
             });
 
-            resultsData.push({
-              id: competition.id,
-              competitionId: competition.id,
-              name: competition.name,
-              date: competition.date,
-              ageGroupResults: participantsData,
-            });
+            if (
+              Object.values(participantsData).some((group) => group.length > 0)
+            ) {
+              resultsData.push({
+                id: competition.id,
+                competitionId: competition.id,
+                name: competition.name,
+                date: competition.date,
+                ageGroupResults: participantsData,
+              });
+            }
           }
         }
 
+        resultsData.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
         setResults(resultsData);
         setLoading(false);
       } catch (error) {
@@ -116,13 +145,22 @@ const ResultsPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b mt-12 from-orange-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-orange-600 sm:text-5xl mb-4">
-            Резултати от състезания
-          </h1>
-          <p className="text-lg text-gray-600">
-            Преглед на класирания по възрастови групи
-          </p>
+        <div className="flex justify-between items-center mb-16">
+          <div className="text-center flex-grow">
+            <h1 className="text-4xl font-bold text-orange-600 sm:text-5xl mb-4">
+              Резултати от състезания
+            </h1>
+            <p className="text-lg text-gray-600">
+              Преглед на класирания по възрастови групи
+            </p>
+          </div>
+          {isAdmin && (
+            <Link href="/competitions/manage-results" className="ml-4">
+              <Button className="bg-orange-500 hover:bg-orange-600">
+                Управление на резултати
+              </Button>
+            </Link>
+          )}
         </div>
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -134,12 +172,9 @@ const ResultsPage = () => {
             >
               <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-orange-100 hover:border-orange-300">
                 <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-4">
-                  <Link
-                    href={`/competitions/${result.competitionId}`}
-                    className="text-xl font-semibold text-white hover:text-orange-100"
-                  >
+                  <div className="text-xl font-semibold text-white hover:text-orange-100">
                     {result.name}
-                  </Link>
+                  </div>
                   <p className="text-orange-100 flex items-center mt-2">
                     <CalendarIcon className="w-5 h-5 mr-2" />
                     {new Date(result.date).toLocaleDateString("bg-BG")}
@@ -162,16 +197,16 @@ const ResultsPage = () => {
                               <div className="flex items-center">
                                 <span
                                   className={`
-                                w-8 h-8 rounded-full flex items-center justify-center mr-3
-                                ${
-                                  participant.place === 1
-                                    ? "bg-amber-400 shadow-amber-200"
-                                    : participant.place === 2
-                                    ? "bg-gray-300 shadow-gray-200"
-                                    : "bg-amber-700 shadow-amber-300"
-                                }
-                                shadow-lg text-white font-bold
-                              `}
+                                  w-8 h-8 rounded-full flex items-center justify-center mr-3
+                                  ${
+                                    participant.place === 1
+                                      ? "bg-amber-400 shadow-amber-200"
+                                      : participant.place === 2
+                                      ? "bg-gray-300 shadow-gray-200"
+                                      : "bg-amber-700 shadow-amber-300"
+                                  }
+                                  shadow-lg text-white font-bold
+                                `}
                                 >
                                   {participant.place}
                                 </span>

@@ -9,6 +9,12 @@ export interface User {
   gender: string;
 }
 
+export interface CompetitionResult {
+  time: string;
+  place?: number;
+  updatedAt: string;
+}
+
 export interface Competition {
   id: string;
   name: string;
@@ -19,4 +25,7 @@ export interface Competition {
   entryFee: number;
   ageGroups: string[];
   participants: string[];
+  results?: {
+    [userId: string]: CompetitionResult;
+  };
 }

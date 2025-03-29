@@ -14,6 +14,7 @@ import {
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db, auth } from "@/firebase/firebase";
 import type { Competition, User } from "@/interfaces";
+import { Plus } from "lucide-react"; // добавете този импорт
 
 async function fetchCompetitions(): Promise<Competition[]> {
   const querySnapshot = await getDocs(collection(db, "competitions"));
@@ -66,19 +67,9 @@ export default function CompetitionsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 mt-16 min-h-screen">
+    <div className="container mx-auto px-4 py-8 min-h-screen relative">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold text-orange-500">Състезания</h1>
-        {isAdmin && (
-          <Link href="/competitions/new">
-            <Button
-              variant="outline"
-              className="text-orange-500 border-orange-500"
-            >
-              Добави състезание
-            </Button>
-          </Link>
-        )}
       </div>
 
       {competitions.length === 0 ? (
@@ -134,6 +125,16 @@ export default function CompetitionsPage() {
             </Card>
           ))}
         </div>
+      )}
+
+      {isAdmin && (
+        <Link
+          href="/competitions/manage"
+          className="fixed bottom-8 right-8 w-14 h-14 bg-orange-500 rounded-full flex items-center justify-center shadow-lg hover:bg-orange-600 transition-colors z-50"
+          title="Създай състезание"
+        >
+          <Plus className="w-6 h-6 text-white" />
+        </Link>
       )}
     </div>
   );
