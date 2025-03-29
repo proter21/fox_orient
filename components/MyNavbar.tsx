@@ -128,14 +128,6 @@ const MyNavbar = () => {
             <MenubarContent className="bg-zinc-800 text-white shadow-lg w-48 mt-2 rounded">
               <MenubarItem asChild>
                 <Link
-                  href="/classes"
-                  className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
-                >
-                  GPS
-                </Link>
-              </MenubarItem>
-              <MenubarItem asChild>
-                <Link
                   href="/results"
                   className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
                 >
@@ -201,14 +193,6 @@ const MyNavbar = () => {
                   className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
                 >
                   Кои сме ние?
-                </Link>
-              </MenubarItem>
-              <MenubarItem asChild>
-                <Link
-                  href="/competitors"
-                  className="block px-4 py-2 hover:bg-orange-600 transition duration-300 focus:bg-orange-600 rounded"
-                >
-                  Състезатели
                 </Link>
               </MenubarItem>
               <MenubarItem asChild>
@@ -346,15 +330,6 @@ const MyNavbar = () => {
                       >
                         <li>
                           <Link
-                            href="/classes"
-                            className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
-                            onClick={toggleMenu}
-                          >
-                            GPS
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
                             href="/results"
                             className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
                             onClick={toggleMenu}
@@ -489,15 +464,6 @@ const MyNavbar = () => {
                             onClick={toggleMenu}
                           >
                             Кои сме ние?
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/competitors"
-                            className="block px-4 py-2 hover:bg-orange-600 transition duration-300 rounded"
-                            onClick={toggleMenu}
-                          >
-                            Състезатели
                           </Link>
                         </li>
                         <li>

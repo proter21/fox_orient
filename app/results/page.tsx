@@ -144,26 +144,29 @@ const ResultsPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b mt-12 from-orange-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex justify-between items-center mb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 sm:mb-16 gap-4">
           <div className="text-center flex-grow">
-            <h1 className="text-4xl font-bold text-orange-600 sm:text-5xl mb-4">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-orange-600 mb-4">
               Резултати от състезания
             </h1>
-            <p className="text-lg text-gray-600">
+            <p className="text-base sm:text-lg text-gray-600">
               Преглед на класирания по възрастови групи
             </p>
           </div>
           {isAdmin && (
-            <Link href="/competitions/manage-results" className="ml-4">
-              <Button className="bg-orange-500 hover:bg-orange-600">
+            <Link
+              href="/competitions/manage-results"
+              className="w-full sm:w-auto"
+            >
+              <Button className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto">
                 Управление на резултати
               </Button>
             </Link>
           )}
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 lg:gap-8 md:grid-cols-2 lg:grid-cols-3">
           {results.map((result) => (
             <Link
               href={`/competitions/${result.competitionId}`}
@@ -171,53 +174,50 @@ const ResultsPage = () => {
               className="block"
             >
               <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-orange-100 hover:border-orange-300">
-                <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-4">
-                  <div className="text-xl font-semibold text-white hover:text-orange-100">
+                <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-3 sm:p-4">
+                  <div className="text-lg sm:text-xl font-semibold text-white hover:text-orange-100 line-clamp-2">
                     {result.name}
                   </div>
-                  <p className="text-orange-100 flex items-center mt-2">
-                    <CalendarIcon className="w-5 h-5 mr-2" />
+                  <p className="text-orange-100 flex items-center mt-2 text-sm sm:text-base">
+                    <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                     {new Date(result.date).toLocaleDateString("bg-BG")}
                   </p>
                 </div>
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   {Object.entries(result.ageGroupResults).map(
                     ([ageGroup, participants]) => (
-                      <div key={ageGroup} className="mb-6 last:mb-0">
-                        <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
-                          <TrophyIcon className="w-5 h-5 mr-2 text-orange-500" />
+                      <div key={ageGroup} className="mb-4 sm:mb-6 last:mb-0">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-3 sm:mb-4 flex items-center">
+                          <TrophyIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-orange-500" />
                           Група {ageGroup}
                         </h3>
-                        <div className="space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
                           {participants.map((participant) => (
                             <div
                               key={participant.userId}
-                              className="flex items-center justify-between p-3 rounded-lg hover:bg-orange-50 transition-colors"
+                              className="flex items-center justify-between p-2 sm:p-3 rounded-lg hover:bg-orange-50 transition-colors"
                             >
-                              <div className="flex items-center">
+                              <div className="flex items-center min-w-0">
                                 <span
                                   className={`
-                                  w-8 h-8 rounded-full flex items-center justify-center mr-3
-                                  ${
-                                    participant.place === 1
-                                      ? "bg-amber-400 shadow-amber-200"
-                                      : participant.place === 2
-                                      ? "bg-gray-300 shadow-gray-200"
-                                      : "bg-amber-700 shadow-amber-300"
-                                  }
-                                  shadow-lg text-white font-bold
-                                `}
+                                w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center mr-2 sm:mr-3
+                                ${
+                                  participant.place === 1
+                                    ? "bg-amber-400 shadow-amber-200"
+                                    : participant.place === 2
+                                    ? "bg-gray-300 shadow-gray-200"
+                                    : "bg-amber-700 shadow-amber-300"
+                                }
+                                shadow-lg text-white font-bold text-sm sm:text-base
+                              `}
                                 >
                                   {participant.place}
                                 </span>
-                                <Link
-                                  href={`/profile/${participant.userId}`}
-                                  className="text-gray-800 hover:text-orange-600 font-medium"
-                                >
+                                <span className="text-gray-800 hover:text-orange-600 font-medium truncate">
                                   {participant.name}
-                                </Link>
+                                </span>
                               </div>
-                              <span className="text-gray-600 bg-orange-50 px-3 py-1 rounded-full font-mono">
+                              <span className="text-gray-600 bg-orange-50 px-2 sm:px-3 py-1 rounded-full font-mono text-sm sm:text-base ml-2">
                                 {participant.time}
                               </span>
                             </div>

@@ -55,10 +55,10 @@ export default function ManageResultsSelectionPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b mt-12 from-orange-50 to-white py-12">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-orange-600">
+            <CardTitle className="text-xl sm:text-2xl font-bold text-orange-600 text-center sm:text-left">
               Изберете състезание
             </CardTitle>
           </CardHeader>
@@ -70,9 +70,9 @@ export default function ManageResultsSelectionPage() {
                 className="block"
               >
                 <div className="p-4 bg-white rounded-lg border border-orange-100 hover:border-orange-300 hover:shadow-md transition-all duration-300">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <h3 className="font-medium">{competition.name}</h3>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 sm:ml-4">
                       {new Date(competition.date).toLocaleDateString("bg-BG")}
                     </span>
                   </div>

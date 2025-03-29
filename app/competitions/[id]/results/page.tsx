@@ -167,16 +167,16 @@ export default function ManageResultsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b mt-12 from-orange-50 to-white py-12">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-2xl font-bold text-orange-600">
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <CardTitle className="text-xl sm:text-2xl font-bold text-orange-600">
               Управление на резултати - {competition?.name}
             </CardTitle>
             {hasChanges && (
               <Button
                 onClick={handleSaveAllResults}
-                className="bg-orange-500 hover:bg-orange-600"
+                className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto"
               >
                 Запази всички резултати
               </Button>
@@ -186,26 +186,26 @@ export default function ManageResultsPage() {
             {Object.entries(groupedParticipants).map(
               ([ageGroup, groupParticipants]) => (
                 <div key={ageGroup} className="mb-8 last:mb-0">
-                  <h2 className="text-xl font-semibold text-orange-600 mb-4">
+                  <h2 className="text-lg sm:text-xl font-semibold text-orange-600 mb-4">
                     Група {ageGroup}
                   </h2>
                   <div className="space-y-4">
                     {groupParticipants.map((participant) => (
                       <div
                         key={participant.id}
-                        className="flex items-center justify-between p-4 border rounded-lg"
+                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-lg gap-4"
                       >
                         <div>
-                          <h3 className="font-medium">
+                          <h3 className="font-medium mb-2 sm:mb-0">
                             {participant.fullName}
                           </h3>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
                           <Input
                             type="time"
                             step="1"
                             defaultValue={participant.result?.time}
-                            className={`w-32 ${
+                            className={`w-full sm:w-32 ${
                               participant.tempTime ? "border-orange-500" : ""
                             }`}
                             onChange={(e) =>
@@ -214,7 +214,7 @@ export default function ManageResultsPage() {
                           />
                           {(participant.result?.updatedAt ||
                             participant.tempTime) && (
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-500 whitespace-nowrap">
                               {participant.tempTime
                                 ? "Незапазена промяна"
                                 : `Обновено: ${new Date(

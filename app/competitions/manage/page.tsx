@@ -163,13 +163,15 @@ export default function ManageCompetitionsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-4xl font-bold text-orange-500">Админ Панел</h1>
-        <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
+        <h1 className="text-3xl sm:text-4xl font-bold text-orange-500">
+          Админ Панел
+        </h1>
+        <div className="flex flex-col sm:flex-row gap-4">
           <Link href="/competitions/manage-results">
             <Button
               variant="outline"
-              className="border-orange-200 hover:bg-orange-50"
+              className="w-full sm:w-auto border-orange-200 hover:bg-orange-50"
             >
               Управление на резултати
             </Button>
@@ -177,7 +179,7 @@ export default function ManageCompetitionsPage() {
           <Link href="/competitions">
             <Button
               variant="outline"
-              className="border-orange-200 hover:bg-orange-50"
+              className="w-full sm:w-auto border-orange-200 hover:bg-orange-50"
             >
               Към състезания
             </Button>
@@ -307,10 +309,10 @@ export default function ManageCompetitionsPage() {
         <TabsContent value="manage">
           <Card className="shadow-lg border-orange-200">
             <CardHeader className="bg-orange-50 border-b border-orange-100">
-              <CardTitle className="text-2xl text-orange-600">
+              <CardTitle className="text-xl sm:text-2xl text-orange-600">
                 Управление на състезания
               </CardTitle>
-              <div className="flex gap-4 mt-4">
+              <div className="flex flex-col lg:flex-row gap-4 mt-4">
                 <div className="flex-1">
                   <div className="relative">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -322,7 +324,7 @@ export default function ManageCompetitionsPage() {
                     />
                   </div>
                 </div>
-                <div className="w-fit">
+                <div className="w-full lg:w-auto flex justify-center">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
@@ -333,56 +335,68 @@ export default function ManageCompetitionsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[500px] rounded-md">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-orange-50">
-                      <TableHead className="font-bold">Име</TableHead>
-                      <TableHead className="font-bold">Дата</TableHead>
-                      <TableHead className="font-bold">
-                        Местоположение
-                      </TableHead>
-                      <TableHead className="font-bold">Участници</TableHead>
-                      <TableHead className="font-bold">Действия</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredCompetitions.map((competition) => (
-                      <TableRow
-                        key={competition.id}
-                        className="hover:bg-orange-50/50"
-                      >
-                        <TableCell className="font-medium">
-                          {competition.name}
-                        </TableCell>
-                        <TableCell>
-                          {new Date(competition.date).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>{competition.location}</TableCell>
-                        <TableCell>
-                          {competition.participants?.length || 0}
-                        </TableCell>
-                        <TableCell className="space-x-2">
-                          <Link href={`/competitions/${competition.id}`}>
-                            <Button
-                              variant="outline"
-                              className="border-orange-200 hover:bg-orange-50"
-                            >
-                              Преглед
-                            </Button>
-                          </Link>
-                          <Button
-                            variant="destructive"
-                            onClick={() => handleDelete(competition.id)}
-                            className="bg-red-500 hover:bg-red-600"
-                          >
-                            Изтрий
-                          </Button>
-                        </TableCell>
+              <ScrollArea className="h-[400px] sm:h-[500px] rounded-md">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-orange-50">
+                        <TableHead className="font-bold whitespace-nowrap">
+                          Име
+                        </TableHead>
+                        <TableHead className="font-bold whitespace-nowrap">
+                          Дата
+                        </TableHead>
+                        <TableHead className="font-bold whitespace-nowrap">
+                          Местоположение
+                        </TableHead>
+                        <TableHead className="font-bold whitespace-nowrap">
+                          Участници
+                        </TableHead>
+                        <TableHead className="font-bold whitespace-nowrap">
+                          Действия
+                        </TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredCompetitions.map((competition) => (
+                        <TableRow
+                          key={competition.id}
+                          className="hover:bg-orange-50/50"
+                        >
+                          <TableCell className="font-medium whitespace-nowrap">
+                            {competition.name}
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            {new Date(competition.date).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            {competition.location}
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            {competition.participants?.length || 0}
+                          </TableCell>
+                          <TableCell className="space-x-2 whitespace-nowrap">
+                            <Link href={`/competitions/${competition.id}`}>
+                              <Button
+                                variant="outline"
+                                className="border-orange-200 hover:bg-orange-50"
+                              >
+                                Преглед
+                              </Button>
+                            </Link>
+                            <Button
+                              variant="destructive"
+                              onClick={() => handleDelete(competition.id)}
+                              className="bg-red-500 hover:bg-red-600"
+                            >
+                              Изтрий
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </ScrollArea>
             </CardContent>
           </Card>
