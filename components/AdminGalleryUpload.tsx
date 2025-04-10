@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { storage, db } from "@/firebase/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db } from "@/firebase/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -23,7 +22,7 @@ const AdminGalleryUpload = ({
   onEventCreated,
 }: AdminGalleryUploadProps) => {
   const [eventName, setEventName] = useState("");
-  const [files, setFiles] = useState<FileList | null>(null);
+  const [imageUrls, setImageUrls] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -31,8 +30,8 @@ const AdminGalleryUpload = ({
   if (!isAdmin) return null;
 
   const handleUpload = async () => {
-    if (!files || !eventName) {
-      setError("Моля, изберете снимки и въведете име на събитието");
+    if (!imageUrls || !eventName) {
+      setError("Моля, въведете URL на снимките и име на събитието");
       return;
     }
 
@@ -47,13 +46,12 @@ const AdminGalleryUpload = ({
 
       const eventRef = await addDoc(collection(db, "events"), eventData);
 
-      const uploadPromises = Array.from(files).map(async (file, index) => {
-        const storageRef = ref(storage, `gallery/${eventRef.id}/${file.name}`);
-        await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(storageRef);
+      // Split URLs by newline and filter empty lines
+      const urlList = imageUrls.split("\n").filter((url) => url.trim() !== "");
 
+      const uploadPromises = urlList.map(async (url, index) => {
         return addDoc(collection(db, "gallery"), {
-          imageUrl: url,
+          imageUrl: url.trim(),
           competitionId: eventRef.id,
           competitionName: eventName,
           caption: `${eventName} - Снимка ${index + 1}`,
@@ -63,12 +61,12 @@ const AdminGalleryUpload = ({
 
       await Promise.all(uploadPromises);
       setEventName("");
-      setFiles(null);
+      setImageUrls("");
       setIsOpen(false);
       onEventCreated?.();
     } catch (error) {
-      setError("Грешка при качването на снимките");
-      console.error("Error uploading:", error);
+      setError("Грешка при запазването на снимките");
+      console.error("Error saving:", error);
     } finally {
       setUploading(false);
     }
@@ -92,18 +90,18 @@ const AdminGalleryUpload = ({
             value={eventName}
             onChange={(e) => setEventName(e.target.value)}
           />
-          <Input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={(e) => setFiles(e.target.files)}
+          <textarea
+            placeholder="Въведете URL адресите на снимките (по един на ред)"
+            value={imageUrls}
+            onChange={(e) => setImageUrls(e.target.value)}
+            className="w-full h-32 p-2 border rounded-md"
           />
           <Button
             onClick={handleUpload}
             disabled={uploading}
             className="w-full bg-orange-500 hover:bg-orange-600"
           >
-            {uploading ? "Качване..." : "Създай събитие"}
+            {uploading ? "Запазване..." : "Създай събитие"}
           </Button>
           {error && <p className="text-red-500 text-sm">{error}</p>}
         </div>

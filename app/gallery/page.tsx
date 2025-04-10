@@ -6,9 +6,10 @@ import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
 import AdminGalleryUpload from "@/components/AdminGalleryUpload";
 import { useAuth } from "@/context/AuthContext";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface GalleryItem {
   id: string;
@@ -18,16 +19,15 @@ interface GalleryItem {
   competitionName: string;
 }
 
-interface Competition {
-  id: string;
-  name: string;
-}
-
 const GalleryPage: React.FC = () => {
   const { isAdmin } = useAuth();
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
-  const [competitions, setCompetitions] = useState<Competition[]>([]);
+  // Removed unused competitions state
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+  const [currentEventImages, setCurrentEventImages] = useState<GalleryItem[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
 
   const fetchGalleryData = async () => {
@@ -40,13 +40,7 @@ const GalleryPage: React.FC = () => {
       );
       setGalleryItems(galleryData);
 
-      const uniqueCompetitions = Array.from(
-        new Set(galleryData.map((item) => item.competitionId))
-      ).map((id) => {
-        const item = galleryData.find((i) => i.competitionId === id);
-        return { id, name: item?.competitionName || "" };
-      });
-      setCompetitions(uniqueCompetitions);
+      // Removed logic for setting competitions as it is unused
     } catch (error) {
       console.error("Error fetching gallery data:", error);
     } finally {
@@ -57,6 +51,40 @@ const GalleryPage: React.FC = () => {
   useEffect(() => {
     fetchGalleryData();
   }, []);
+
+  const openGalleryModal = (item: GalleryItem) => {
+    const eventImages = galleryItems.filter(
+      (img) => img.competitionId === item.competitionId
+    );
+    const index = eventImages.findIndex((img) => img.id === item.id);
+    setCurrentEventImages(eventImages);
+    setCurrentImageIndex(index);
+    setSelectedImage(item);
+  };
+
+  const nextImage = () => {
+    const newIndex = (currentImageIndex + 1) % currentEventImages.length;
+    setCurrentImageIndex(newIndex);
+    setSelectedImage(currentEventImages[newIndex]);
+  };
+
+  const previousImage = () => {
+    const newIndex =
+      (currentImageIndex - 1 + currentEventImages.length) %
+      currentEventImages.length;
+    setCurrentImageIndex(newIndex);
+    setSelectedImage(currentEventImages[newIndex]);
+  };
+
+  const getFirstImagesByCompetition = () => {
+    const groupedImages: { [key: string]: GalleryItem } = {};
+    galleryItems.forEach((item) => {
+      if (!groupedImages[item.competitionId]) {
+        groupedImages[item.competitionId] = item;
+      }
+    });
+    return Object.values(groupedImages);
+  };
 
   if (loading) {
     return (
@@ -73,84 +101,84 @@ const GalleryPage: React.FC = () => {
           Галерия
         </h1>
 
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="w-full flex overflow-x-auto mb-8">
-            <TabsTrigger value="all" className="flex-shrink-0">
-              Всички събития
-            </TabsTrigger>
-            {competitions.map((comp) => (
-              <TabsTrigger
-                key={comp.id}
-                value={comp.id}
-                className="flex-shrink-0"
-              >
-                {comp.name}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-
-          <TabsContent value="all" className="mt-0">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {galleryItems.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="relative aspect-square cursor-pointer"
-                  onClick={() => setSelectedImage(item)}
-                >
-                  <Image
-                    src={item.imageUrl}
-                    alt={item.caption}
-                    fill
-                    className="object-cover rounded-lg hover:scale-105 transition-transform duration-300"
-                  />
-                </motion.div>
-              ))}
-            </div>
-          </TabsContent>
-
-          {competitions.map((comp) => (
-            <TabsContent key={comp.id} value={comp.id} className="mt-0">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {galleryItems
-                  .filter((item) => item.competitionId === comp.id)
-                  .map((item, index) => (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="relative aspect-square cursor-pointer"
-                      onClick={() => setSelectedImage(item)}
-                    >
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.caption}
-                        fill
-                        className="object-cover rounded-lg hover:scale-105 transition-transform duration-300"
-                      />
-                    </motion.div>
-                  ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {getFirstImagesByCompetition().map((item, index) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="relative aspect-square cursor-pointer group overflow-hidden rounded-lg"
+              onClick={() => openGalleryModal(item)}
+            >
+              <div className="w-full h-full relative">
+                <Image
+                  src={item.imageUrl}
+                  alt={item.caption}
+                  fill
+                  unoptimized
+                  className="object-cover"
+                  loading="lazy"
+                />
               </div>
-            </TabsContent>
+              <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <h3 className="text-white text-xl font-semibold text-center p-4">
+                  {item.competitionName}
+                </h3>
+              </div>
+            </motion.div>
           ))}
-        </Tabs>
+        </div>
 
         <Dialog
           open={!!selectedImage}
-          onOpenChange={() => setSelectedImage(null)}
+          onOpenChange={() => {
+            setSelectedImage(null);
+            setCurrentEventImages([]);
+            setCurrentImageIndex(0);
+          }}
         >
-          <DialogContent className="max-w-4xl">
+          <DialogContent className="max-w-[95vw] md:max-w-4xl h-[90vh] flex items-center justify-center p-0">
+            <DialogTitle className="sr-only">
+              {selectedImage?.caption || "Gallery Image"}
+            </DialogTitle>
             {selectedImage && (
-              <div className="relative aspect-video">
-                <Image
-                  src={selectedImage.imageUrl}
-                  alt={selectedImage.caption}
-                  fill
-                  className="object-contain"
-                />
+              <div className="relative w-full h-full">
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <Image
+                    src={selectedImage.imageUrl}
+                    alt={selectedImage.caption}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                {currentEventImages.length > 1 && (
+                  <>
+                    <Button
+                      variant="outline"
+                      className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        previousImage();
+                      }}
+                    >
+                      <ChevronLeft />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        nextImage();
+                      }}
+                    >
+                      <ChevronRight />
+                    </Button>
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full">
+                      {currentImageIndex + 1} / {currentEventImages.length}
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </DialogContent>
