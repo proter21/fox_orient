@@ -2,14 +2,27 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  orderBy,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "@/firebase/firebase";
 import AdminGalleryUpload from "@/components/AdminGalleryUpload";
 import { useAuth } from "@/context/AuthContext";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
 interface GalleryItem {
   id: string;
@@ -22,7 +35,6 @@ interface GalleryItem {
 const GalleryPage: React.FC = () => {
   const { isAdmin } = useAuth();
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
-  // Removed unused competitions state
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [currentEventImages, setCurrentEventImages] = useState<GalleryItem[]>(
@@ -30,7 +42,7 @@ const GalleryPage: React.FC = () => {
   );
   const [loading, setLoading] = useState(true);
 
-  const fetchGalleryData = async () => {
+  const fetchGalleryData = React.useCallback(async () => {
     try {
       const galleryRef = collection(db, "gallery");
       const galleryQuery = query(galleryRef, orderBy("createdAt", "desc"));
@@ -39,18 +51,66 @@ const GalleryPage: React.FC = () => {
         (doc) => ({ id: doc.id, ...doc.data() } as GalleryItem)
       );
       setGalleryItems(galleryData);
-
-      // Removed logic for setting competitions as it is unused
     } catch (error) {
       console.error("Error fetching gallery data:", error);
+      toast({
+        title: "Грешка при зареждане на галерията",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
+    }
+  }, []);
+
+  const deleteEvent = async (competitionId: string) => {
+    if (!window.confirm("Сигурни ли сте, че искате да изтриете това събитие?"))
+      return;
+
+    try {
+      const eventImages = galleryItems.filter(
+        (img) => img.competitionId === competitionId
+      );
+      await Promise.all(
+        eventImages.map((img) => deleteDoc(doc(db, "gallery", img.id)))
+      );
+      await deleteDoc(doc(db, "events", competitionId));
+      fetchGalleryData();
+      toast({
+        title: "Успешно изтрито събитие",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      toast({
+        title: "Грешка при изтриване на събитието",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteImage = async (imageId: string) => {
+    if (!window.confirm("Сигурни ли сте, че искате да изтриете тази снимка?"))
+      return;
+
+    try {
+      await deleteDoc(doc(db, "gallery", imageId));
+      fetchGalleryData();
+      setSelectedImage(null);
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      toast({
+        title: "Грешка при изтриване на снимката",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
     }
   };
 
   useEffect(() => {
     fetchGalleryData();
-  }, []);
+  }, [fetchGalleryData]);
 
   const openGalleryModal = (item: GalleryItem) => {
     const eventImages = galleryItems.filter(
@@ -120,6 +180,21 @@ const GalleryPage: React.FC = () => {
                   className="object-cover"
                   loading="lazy"
                 />
+                {isAdmin && (
+                  <div className="absolute top-2 right-2 space-x-2 z-10">
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="w-8 h-8"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteEvent(item.competitionId);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
               <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                 <h3 className="text-white text-xl font-semibold text-center p-4">
@@ -142,16 +217,48 @@ const GalleryPage: React.FC = () => {
             <DialogTitle className="sr-only">
               {selectedImage?.caption || "Gallery Image"}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Изображение от галерията
+            </DialogDescription>
             {selectedImage && (
               <div className="relative w-full h-full">
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <Image
-                    src={selectedImage.imageUrl}
-                    alt={selectedImage.caption}
-                    fill
-                    className="object-contain"
-                  />
+                <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
+                      key={selectedImage.id}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.2, ease: "easeInOut" }}
+                      className="relative w-full h-full"
+                    >
+                      <Image
+                        src={selectedImage.imageUrl}
+                        alt={selectedImage.caption}
+                        className="max-w-full max-h-full object-contain"
+                        fill
+                        unoptimized
+                        onError={() => {
+                          setSelectedImage({
+                            ...selectedImage,
+                            imageUrl: "/images/placeholder.jpg",
+                          });
+                        }}
+                      />
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
+                {isAdmin && (
+                  <div className="absolute top-2 right-2 space-x-2 z-10">
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => deleteImage(selectedImage.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
                 {currentEventImages.length > 1 && (
                   <>
                     <Button
