@@ -67,46 +67,51 @@ export default function CalendarPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4">
-            {competitions.length === 0 ? (
+            {competitions.filter((comp) => new Date(comp.date) >= new Date())
+              .length === 0 ? (
               <p className="text-gray-500 text-center py-4">
                 Няма предстоящи състезания
               </p>
             ) : (
               <ul className="space-y-4">
-                {competitions.map((competition) => (
-                  <li
-                    key={competition.id}
-                    className="group border-l-4 border-orange-500 pl-4 py-2 hover:bg-orange-50 transition-colors duration-200"
-                  >
-                    <Link
-                      href={`/competitions/${competition.id}`}
-                      className="block"
+                {competitions
+                  .filter(
+                    (competition) => new Date(competition.date) >= new Date()
+                  )
+                  .map((competition) => (
+                    <li
+                      key={competition.id}
+                      className="group border-l-4 border-orange-500 pl-4 py-2 hover:bg-orange-50 transition-colors duration-200"
                     >
-                      <div className="flex flex-col space-y-1">
-                        <span className="font-semibold text-lg text-orange-600">
-                          {competition.name}
-                        </span>
-                        <div className="flex items-center text-sm text-gray-600 space-x-2">
-                          <span>
-                            {new Date(competition.date).toLocaleDateString(
-                              "bg-BG",
-                              {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              }
-                            )}
+                      <Link
+                        href={`/competitions/${competition.id}`}
+                        className="block"
+                      >
+                        <div className="flex flex-col space-y-1">
+                          <span className="font-semibold text-lg text-orange-600">
+                            {competition.name}
                           </span>
-                          <span>•</span>
-                          <span>{competition.time}</span>
+                          <div className="flex items-center text-sm text-gray-600 space-x-2">
+                            <span>
+                              {new Date(competition.date).toLocaleDateString(
+                                "bg-BG",
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                }
+                              )}
+                            </span>
+                            <span>•</span>
+                            <span>{competition.time}</span>
+                          </div>
+                          <span className="text-sm text-gray-500">
+                            {competition.location}
+                          </span>
                         </div>
-                        <span className="text-sm text-gray-500">
-                          {competition.location}
-                        </span>
-                      </div>
-                    </Link>
-                  </li>
-                ))}
+                      </Link>
+                    </li>
+                  ))}
               </ul>
             )}
           </CardContent>
