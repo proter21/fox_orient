@@ -3,8 +3,15 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Search, Calendar, Tag } from "lucide-react";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import { Search, Calendar, Tag, Trash2 } from "lucide-react";
+import {
+  collection,
+  query,
+  orderBy,
+  getDocs,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
 import { db } from "@/firebase/firebase";
 import AdminNewsUpload from "@/components/AdminNewsUpload";
 import { useAuth } from "@/context/AuthContext";
@@ -53,6 +60,17 @@ export default function NewsPage() {
       item.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (!selectedCategory || item.category === selectedCategory)
   );
+
+  const deleteNews = async (id: string) => {
+    if (window.confirm("Сигурни ли сте, че искате да изтриете тази новина?")) {
+      try {
+        await deleteDoc(doc(db, "news", id));
+        await fetchNews(); // Refresh the news list
+      } catch (error) {
+        console.error("Error deleting news:", error);
+      }
+    }
+  };
 
   return (
     <div className="bg-gray-100 min-h-screen text-gray-900 pt-16">
@@ -104,10 +122,18 @@ export default function NewsPage() {
           {filteredNews.map((item) => (
             <motion.div
               key={item.id}
-              className="bg-white rounded-lg overflow-hidden shadow-lg"
+              className="bg-white rounded-lg overflow-hidden shadow-lg relative"
               whileHover={{ scale: 1.03 }}
               transition={{ duration: 0.3 }}
             >
+              {isAdmin && (
+                <button
+                  onClick={() => deleteNews(item.id)}
+                  className="absolute top-2 right-2 p-2 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"
+                >
+                  <Trash2 size={20} />
+                </button>
+              )}
               <Image
                 src={item.imageUrl || "/placeholder.svg"}
                 alt={item.title}
