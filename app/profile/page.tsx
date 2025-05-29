@@ -38,7 +38,7 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       if (!currentUser) {
-        router.push("/"); // Redirect if not logged in
+        router.push("/");
       }
     });
 

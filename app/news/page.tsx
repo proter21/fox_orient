@@ -65,7 +65,7 @@ export default function NewsPage() {
     if (window.confirm("Сигурни ли сте, че искате да изтриете тази новина?")) {
       try {
         await deleteDoc(doc(db, "news", id));
-        await fetchNews(); // Refresh the news list
+        await fetchNews();
       } catch (error) {
         console.error("Error deleting news:", error);
       }
