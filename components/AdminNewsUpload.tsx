@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { storage, db } from "@/firebase/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/firebase/firebase";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -34,7 +33,7 @@ const AdminNewsUpload = ({ isAdmin, onNewsCreated }: AdminNewsUploadProps) => {
   const [category, setCategory] = useState("");
   const [date, setDate] = useState("");
   const [link, setLink] = useState("");
-  const [image, setImage] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +41,7 @@ const AdminNewsUpload = ({ isAdmin, onNewsCreated }: AdminNewsUploadProps) => {
   if (!isAdmin) return null;
 
   const handleSubmit = async () => {
-    if (!title || !excerpt || !category || !date || !image) {
+    if (!title || !excerpt || !category || !date || !imageUrl) {
       setError("Моля, попълнете всички полета");
       return;
     }
@@ -51,10 +50,6 @@ const AdminNewsUpload = ({ isAdmin, onNewsCreated }: AdminNewsUploadProps) => {
     setError(null);
 
     try {
-      const imageRef = ref(storage, `news/${Date.now()}_${image.name}`);
-      await uploadBytes(imageRef, image);
-      const imageUrl = await getDownloadURL(imageRef);
-
       await addDoc(collection(db, "news"), {
         title,
         excerpt,
@@ -62,7 +57,7 @@ const AdminNewsUpload = ({ isAdmin, onNewsCreated }: AdminNewsUploadProps) => {
         date,
         imageUrl,
         link,
-        createdAt: new Date(),
+        createdAt: serverTimestamp(),
       });
 
       setTitle("");
@@ -70,7 +65,7 @@ const AdminNewsUpload = ({ isAdmin, onNewsCreated }: AdminNewsUploadProps) => {
       setCategory("");
       setDate("");
       setLink("");
-      setImage(null);
+      setImageUrl("");
       setIsOpen(false);
       onNewsCreated?.();
     } catch (error) {
@@ -126,9 +121,10 @@ const AdminNewsUpload = ({ isAdmin, onNewsCreated }: AdminNewsUploadProps) => {
             onChange={(e) => setLink(e.target.value)}
           />
           <Input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImage(e.target.files?.[0] || null)}
+            type="url"
+            placeholder="URL на изображение"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
           />
           <Button
             onClick={handleSubmit}

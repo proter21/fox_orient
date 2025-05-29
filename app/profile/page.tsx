@@ -17,8 +17,8 @@ import { User, Competition } from "@/interfaces";
 import { useToast } from "@/hooks/use-toast";
 
 const ageGroups = {
-  male: ["м14", "м16", "м19", "м21", "м40", "м50", "м60", "м70"],
-  female: ["ж14", "ж16", "ж19", "ж21", "ж35", "ж50"],
+  male: ["m14", "m16", "m19", "m21", "m40", "m50", "m60", "m70"],
+  female: ["w14", "w16", "w19", "w21", "w35", "w50"],
 };
 
 const ProfilePage: React.FC = () => {

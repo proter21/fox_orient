@@ -17,42 +17,8 @@ interface NewsItem {
   imageUrl: string;
   category: string;
   link?: string;
+  createdAt: Date;
 }
-
-const staticNewsItems: NewsItem[] = [
-  {
-    id: "static-1",
-    title: "Световно първенство по радиозасичане 2025",
-    date: "2025-08-16",
-    excerpt:
-      "Очаквайте 22-ро вълнуващо IARU световно първенство в Бирштонас, Литва.",
-    imageUrl:
-      "https://ardf2025.lt/wp-content/uploads/2024/12/22nd-IARU-World-ARDF-Championships-No.1.png",
-    category: "Състезания",
-    link: "https://ardf2025.lt/bulletin/",
-  },
-  {
-    id: "static-2",
-    title: "YOTA летен лагер 2025",
-    date: "2025-08-18",
-    excerpt: "Тази година летният лагер YOTA ще се проведе във Франция.",
-    imageUrl:
-      "https://www.ham-yota.com/wp-content/uploads/2025/02/yota_summer_camp_25-resize.png",
-    category: "Лагери",
-    link: "https://www.ham-yota.com/category/regional-activities/yota-france-2025/",
-  },
-  {
-    id: "static-3",
-    title: "LZ1KAM лагер в Хисаря",
-    date: "2025-03-31",
-    excerpt:
-      "Радиолюбителски клуб Хасково орагнизира лагер в Хисаря. Занятията ще бъдат на тема Ардуино, обучение за радиолюбителски инициал клас 1 и клас 2, както и тестване на новите приемници.",
-    imageUrl:
-      "https://lh3.googleusercontent.com/pw/AP1GczOYEXYJy9QFcT2_uRD2qfmUgiz1UM2HWBEpB8wpqt9zP7iucR5IN_aDXloX6kDRU9mWnatQzz6JMQjWoewOirTCB-Jy6VpyMtpj0WSDq8iyaodSs-9g8LHYoH_lABsVxqZB0owwkdZr18Nb-KYGQNj4=w1857-h836-s-no-gm?authuser=0",
-    category: "Лагери",
-    link: "http://ramhard.net/lz1kam/",
-  },
-];
 
 export default function NewsPage() {
   const { isAdmin } = useAuth();
@@ -69,14 +35,10 @@ export default function NewsPage() {
         id: doc.id,
         ...doc.data(),
       })) as NewsItem[];
-
-      // Комбиниране на статичните и динамичните новини
-      const allNews = [...staticNewsItems, ...newsData];
-      setNewsItems(allNews);
+      setNewsItems(newsData);
     } catch (error) {
       console.error("Error fetching news:", error);
-      // Ако има грешка при зареждането от Firebase, показваме поне статичните новини
-      setNewsItems(staticNewsItems);
+      setNewsItems([]);
     }
   };
 

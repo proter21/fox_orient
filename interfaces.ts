@@ -29,3 +29,13 @@ export interface Competition {
     [userId: string]: CompetitionResult;
   };
 }
+export interface NewsItem {
+  id: string;
+  title: string;
+  date: string;
+  excerpt: string;
+  imageUrl: string;
+  category: string;
+  link?: string;
+  createdAt: Date;
+}
